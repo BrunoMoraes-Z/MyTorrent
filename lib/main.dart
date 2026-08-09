@@ -29,7 +29,9 @@ Future<void> main() async {
   } catch (_) {
     // MSIX registers the protocol; the development runner may not be eligible.
   }
-  final controller = await AppController.create();
+  final controller = await AppController.create(
+    restartApplication: desktopManager.restart,
+  );
   runApp(
     TorrentDeskApp(
       controller: controller,

@@ -736,8 +736,8 @@ class _DownloadRow extends StatelessWidget {
                   width: 30,
                   height: 30,
                   onPressed: torrent.isPaused
-                      ? () => controller.resume(torrent.id)
-                      : () => controller.pause(torrent.id),
+                      ? () async => controller.resume(torrent.id)
+                      : () async => controller.pause(torrent.id),
                   iconSize: 15,
                   icon: Icon(
                     torrent.isPaused ? LucideIcons.play : LucideIcons.pause,
@@ -780,15 +780,17 @@ class _DownloadRow extends StatelessWidget {
             child: const Text('Cancelar'),
           ),
           ShadButton.destructive(
-            onPressed: () {
-              controller.remove(torrent.id, deleteFiles: false);
+            onPressed: () async {
+              await controller.remove(torrent.id, deleteFiles: false);
+              if (!dialogContext.mounted) return;
               Navigator.of(dialogContext).pop();
             },
             child: const Text('Manter arquivos'),
           ),
           ShadButton.destructive(
-            onPressed: () {
-              controller.remove(torrent.id, deleteFiles: true);
+            onPressed: () async {
+              await controller.remove(torrent.id, deleteFiles: true);
+              if (!dialogContext.mounted) return;
               Navigator.of(dialogContext).pop();
             },
             child: const Text('Apagar arquivos'),
@@ -1050,6 +1052,8 @@ class _SettingsViewState extends State<SettingsView> {
   late final TextEditingController _uploadLimit;
   late bool _restore;
   late bool _notify;
+  late bool _enableDht;
+  late bool _fetchTrackers;
   String? _message;
 
   @override
@@ -1065,6 +1069,8 @@ class _SettingsViewState extends State<SettingsView> {
     );
     _restore = settings.restoreOnLaunch;
     _notify = settings.notifyOnComplete;
+    _enableDht = settings.enableDht;
+    _fetchTrackers = settings.fetchTrackers;
   }
 
   @override
@@ -1089,6 +1095,9 @@ class _SettingsViewState extends State<SettingsView> {
       setState(() => _message = 'Os limites devem ser maiores que zero.');
       return;
     }
+    final shouldRestart =
+        _fetchTrackers != widget.controller.settings.fetchTrackers;
+    if (shouldRestart && !await _confirmRestart()) return;
     try {
       await widget.controller.saveSettings(
         widget.controller.settings.copyWith(
@@ -1099,12 +1108,48 @@ class _SettingsViewState extends State<SettingsView> {
           clearUploadLimit: _uploadLimit.text.trim().isEmpty,
           restoreOnLaunch: _restore,
           notifyOnComplete: _notify,
+          enableDht: _enableDht,
+          fetchTrackers: _fetchTrackers,
         ),
       );
+      if (shouldRestart) {
+        await widget.controller.restartForTrackerSettings();
+        return;
+      }
       if (mounted) setState(() => _message = 'Configurações salvas.');
     } on FileSystemException catch (error) {
       setState(() => _message = error.message);
+    } catch (error) {
+      setState(
+        () => _message = 'Não foi possível reiniciar o aplicativo: $error',
+      );
     }
+  }
+
+  Future<bool> _confirmRestart() async {
+    final restart = await showShadDialog<bool>(
+      context: context,
+      variant: ShadDialogVariant.alert,
+      builder: (dialogContext) => ShadDialog.alert(
+        title: const Text('Reiniciar para aplicar?'),
+        description: const Text(
+          'Os downloads ativos serão pausados, o app será reiniciado e eles serão retomados automaticamente.',
+        ),
+        actions: <Widget>[
+          ShadButton.outline(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          ShadButton(
+            backgroundColor: _accent,
+            foregroundColor: const Color(0xff111113),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Reiniciar agora'),
+          ),
+        ],
+      ),
+    );
+    return restart ?? false;
   }
 
   @override
@@ -1152,6 +1197,60 @@ class _SettingsViewState extends State<SettingsView> {
                 _LabeledInput(
                   label: 'Upload máximo (MB/s)',
                   controller: _uploadLimit,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          _SettingsPanel(
+            title: 'Descoberta de pares',
+            description:
+                'Defina como o app encontra trackers e pares para novos torrents.',
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Usar DHT'),
+                          SizedBox(height: 3),
+                          Text(
+                            'Encontra pares na rede pública descentralizada. Pode conectar a IPs desconhecidos.',
+                            style: TextStyle(color: _muted, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ShadSwitch(
+                      value: _enableDht,
+                      onChanged: (value) => setState(() => _enableDht = value),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: <Widget>[
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Buscar trackers públicos'),
+                          SizedBox(height: 3),
+                          Text(
+                            'Baixa uma lista pública ao reiniciar. Salvar esta alteração pausa e retoma seus downloads.',
+                            style: TextStyle(color: _muted, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ShadSwitch(
+                      value: _fetchTrackers,
+                      onChanged: (value) =>
+                          setState(() => _fetchTrackers = value),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -34,6 +34,17 @@ class DesktopManager with WindowListener, TrayListener {
     await windowManager.focus();
   }
 
+  Future<void> restart() async {
+    await Process.start(
+      Platform.resolvedExecutable,
+      const <String>[],
+      mode: ProcessStartMode.detached,
+    );
+    await trayManager.destroy();
+    await windowManager.destroy();
+    exit(0);
+  }
+
   @override
   void onWindowClose() {
     windowManager.hide();

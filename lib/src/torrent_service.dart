@@ -34,16 +34,26 @@ class TorrentService {
   Stream<Map<int, TorrentInfo>> get updates => _engine.torrentUpdates;
   Map<int, TorrentInfo> get torrents => _engine.torrents;
 
-  static Future<TorrentService> create(String defaultDirectory) async {
+  static Future<TorrentService> create(
+    String defaultDirectory,
+    AppSettings settings,
+  ) async {
     await LibtorrentFlutter.init(
       defaultSavePath: defaultDirectory,
+      fetchTrackers: settings.fetchTrackers,
       pollInterval: const Duration(milliseconds: 500),
     );
-    return TorrentService._(
-      LibtorrentFlutter.instance,
-      const TorrentSourceParser(),
+    final engine = LibtorrentFlutter.instance;
+    engine.configureSession(
+      sessionConfiguration(engine.getDefaultConfig(), settings.enableDht),
     );
+    return TorrentService._(engine, const TorrentSourceParser());
   }
+
+  static BtConfig sessionConfiguration(
+    BtConfig configuration,
+    bool enableDht,
+  ) => configuration.copyWith(disableDht: !enableDht, disableUpnp: true);
 
   Future<PreparedTorrent> prepare(
     String rawSource,
@@ -77,7 +87,7 @@ class TorrentService {
         ),
       );
     } catch (_) {
-      _engine.removeTorrent(id, deleteFiles: true);
+      _engine.removeTorrent(id, deleteFiles: false);
       rethrow;
     }
   }
@@ -146,22 +156,35 @@ class TorrentService {
   }
 
   void start(PreparedTorrent prepared, Set<int> selectedIndexes) {
-    final priorities = mapFilePriorities(prepared.files, selectedIndexes);
-    _engine.setFilePriorities(prepared.id, priorities);
+    setFilePriorities(prepared, selectedIndexes);
+    _engine.resumeTorrent(prepared.id);
   }
 
+  void setFilePriorities(PreparedTorrent prepared, Set<int> selectedIndexes) =>
+      _engine.setFilePriorities(
+        prepared.id,
+        mapFilePriorities(prepared.files, selectedIndexes),
+      );
+
   void cancelPreparation(PreparedTorrent prepared) {
-    _engine.removeTorrent(prepared.id, deleteFiles: true);
+    _engine.removeTorrent(prepared.id, deleteFiles: false);
   }
 
   void pause(int id) => _engine.pauseTorrent(id);
   void resume(int id) => _engine.resumeTorrent(id);
+  void recheck(int id) => _engine.recheckTorrent(id);
   void remove(int id, {required bool deleteFiles}) =>
       _engine.removeTorrent(id, deleteFiles: deleteFiles);
 
   void setLimits(AppSettings settings) {
     _engine.setDownloadLimit(_toBytes(settings.downloadLimitMb));
     _engine.setUploadLimit(_toBytes(settings.uploadLimitMb));
+  }
+
+  void setDhtEnabled(bool enabled) {
+    _engine.configureSession(
+      sessionConfiguration(_engine.getDefaultConfig(), enabled),
+    );
   }
 
   int _toBytes(double? megabytes) =>

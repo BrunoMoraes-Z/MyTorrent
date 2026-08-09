@@ -29,6 +29,8 @@ class AppSettings {
     this.metadataTimeoutSeconds = 30,
     this.restoreOnLaunch = true,
     this.notifyOnComplete = true,
+    this.enableDht = false,
+    this.fetchTrackers = false,
   });
 
   final String downloadDirectory;
@@ -37,6 +39,8 @@ class AppSettings {
   final int metadataTimeoutSeconds;
   final bool restoreOnLaunch;
   final bool notifyOnComplete;
+  final bool enableDht;
+  final bool fetchTrackers;
 
   AppSettings copyWith({
     String? downloadDirectory,
@@ -47,6 +51,8 @@ class AppSettings {
     int? metadataTimeoutSeconds,
     bool? restoreOnLaunch,
     bool? notifyOnComplete,
+    bool? enableDht,
+    bool? fetchTrackers,
   }) {
     return AppSettings(
       downloadDirectory: downloadDirectory ?? this.downloadDirectory,
@@ -60,6 +66,8 @@ class AppSettings {
           metadataTimeoutSeconds ?? this.metadataTimeoutSeconds,
       restoreOnLaunch: restoreOnLaunch ?? this.restoreOnLaunch,
       notifyOnComplete: notifyOnComplete ?? this.notifyOnComplete,
+      enableDht: enableDht ?? this.enableDht,
+      fetchTrackers: fetchTrackers ?? this.fetchTrackers,
     );
   }
 
@@ -70,6 +78,8 @@ class AppSettings {
     'metadataTimeoutSeconds': metadataTimeoutSeconds,
     'restoreOnLaunch': restoreOnLaunch,
     'notifyOnComplete': notifyOnComplete,
+    'enableDht': enableDht,
+    'fetchTrackers': fetchTrackers,
   };
 
   factory AppSettings.fromJson(Map<String, Object?> json, String fallbackPath) {
@@ -81,6 +91,59 @@ class AppSettings {
           (json['metadataTimeoutSeconds'] as num?)?.toInt() ?? 30,
       restoreOnLaunch: json['restoreOnLaunch'] as bool? ?? true,
       notifyOnComplete: json['notifyOnComplete'] as bool? ?? true,
+      enableDht: json['enableDht'] as bool? ?? false,
+      fetchTrackers: json['fetchTrackers'] as bool? ?? false,
+    );
+  }
+}
+
+class DownloadSession {
+  const DownloadSession({
+    required this.source,
+    required this.directory,
+    required this.selectedIndexes,
+    required this.resumeOnLaunch,
+  });
+
+  final String source;
+  final String directory;
+  final List<int> selectedIndexes;
+  final bool resumeOnLaunch;
+
+  DownloadSession copyWith({bool? resumeOnLaunch}) => DownloadSession(
+    source: source,
+    directory: directory,
+    selectedIndexes: selectedIndexes,
+    resumeOnLaunch: resumeOnLaunch ?? this.resumeOnLaunch,
+  );
+
+  Map<String, Object?> toJson() => <String, Object?>{
+    'source': source,
+    'directory': directory,
+    'selectedIndexes': selectedIndexes,
+    'resumeOnLaunch': resumeOnLaunch,
+  };
+
+  factory DownloadSession.fromJson(Map<String, Object?> json) {
+    final source = json['source'];
+    final directory = json['directory'];
+    final selectedIndexes = json['selectedIndexes'];
+    if (source is! String || directory is! String || selectedIndexes is! List) {
+      throw const FormatException('Sessão de download inválida.');
+    }
+    final indexes = selectedIndexes
+        .map((value) {
+          if (value is! num || value < 0 || value != value.roundToDouble()) {
+            throw const FormatException('Índice de arquivo inválido.');
+          }
+          return value.toInt();
+        })
+        .toList(growable: false);
+    return DownloadSession(
+      source: source,
+      directory: directory,
+      selectedIndexes: indexes,
+      resumeOnLaunch: json['resumeOnLaunch'] as bool? ?? true,
     );
   }
 }
