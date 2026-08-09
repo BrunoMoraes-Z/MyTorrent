@@ -1,0 +1,48 @@
+name: Windows MSIX
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
+      - name: Build Windows app
+        run: flutter build windows --release
+      - name: Decode signing certificate
+        if: ${{ secrets.MSIX_CERTIFICATE_BASE64 != '' }}
+        shell: pwsh
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.MSIX_CERTIFICATE_BASE64 }}
+        run: |
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\torrent-desk.pfx", [Convert]::FromBase64String($env:CERTIFICATE_BASE64))
+      - name: Create signed MSIX
+        if: ${{ secrets.MSIX_CERTIFICATE_BASE64 != '' }}
+        env:
+          MSIX_CERTIFICATE_PASSWORD: ${{ secrets.MSIX_CERTIFICATE_PASSWORD }}
+        run: dart run msix:create --sign-msix true --install-certificate false --certificate-path "$env:RUNNER_TEMP\torrent-desk.pfx" --certificate-password "$env:MSIX_CERTIFICATE_PASSWORD"
+      - name: Create development-signed MSIX
+        if: ${{ secrets.MSIX_CERTIFICATE_BASE64 == '' }}
+        run: dart run msix:create --install-certificate false
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-torrent-msix
+          path: build/windows/**/Release/*.msix
+          if-no-files-found: error

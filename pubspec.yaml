@@ -1,0 +1,41 @@
+name: my_torrent
+description: "Cliente desktop de torrents para Windows."
+publish_to: 'none'
+version: 1.0.1+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  file_picker: ^11.0.3
+  flutter:
+    sdk: flutter
+  libtorrent_flutter: ^1.9.2
+  path_provider: ^2.1.5
+  protocol_handler: ^0.2.0
+  shadcn_ui: ^0.56.1
+  tray_manager: ^0.5.3
+  window_manager: ^0.5.2
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  msix: ^3.18.0
+
+flutter:
+  assets:
+    - assets/icons/
+
+msix_config:
+  display_name: My Torrent
+  publisher_display_name: My Torrent
+  identity_name: com.mytorrent.client
+  publisher: CN=My Torrent
+  msix_version: 1.0.1.0
+  logo_path: assets/icons/app_icon.png
+  capabilities: internetClient
+  architecture: x64
+  file_extension: .torrent
+  protocol_activation: magnet
+  install_certificate: false
