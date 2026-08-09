@@ -3,10 +3,10 @@ set shell := ["pwsh", "-NoLogo", "-NoProfile", "-Command"]
 default: msix
 
 certificate:
-    $ErrorActionPreference = 'Stop'; if ([string]::IsNullOrWhiteSpace($env:MSIX_CERTIFICATE_PASSWORD)) { throw 'Defina MSIX_CERTIFICATE_PASSWORD antes de criar o certificado.' }; $password = ConvertTo-SecureString $env:MSIX_CERTIFICATE_PASSWORD -AsPlainText -Force; & .\tool\create_dev_certificate.ps1 -Password $password
+    $ErrorActionPreference = 'Stop'; & .\tool\create_dev_certificate.ps1
 
 quality:
     $ErrorActionPreference = 'Stop'; dart format --output=none --set-exit-if-changed lib test; flutter analyze; flutter test; flutter build windows --release
 
-msix: quality
-    $ErrorActionPreference = 'Stop'; $certificatePath = Join-Path $PWD 'certificates\torrent-desk-dev.pfx'; if ([string]::IsNullOrWhiteSpace($env:MSIX_CERTIFICATE_PASSWORD)) { throw 'Defina MSIX_CERTIFICATE_PASSWORD antes de gerar o MSIX.' }; if (-not (Test-Path -LiteralPath $certificatePath -PathType Leaf)) { throw "Certificado não encontrado: $certificatePath. Execute just certificate primeiro." }; dart run msix:create --sign-msix true --install-certificate false --certificate-path $certificatePath --certificate-password $env:MSIX_CERTIFICATE_PASSWORD
+msix: quality certificate
+    $ErrorActionPreference = 'Stop'; $certificate = Get-ChildItem Cert:\CurrentUser\My | Where-Object { $_.Subject -eq 'CN=My Torrent' -and $_.HasPrivateKey -and $_.NotAfter -gt (Get-Date) } | Sort-Object NotAfter -Descending | Select-Object -First 1; if ($null -eq $certificate) { throw 'Certificado de desenvolvimento não encontrado em CurrentUser\My. Execute just certificate primeiro.' }; dart run msix:create --build-windows false --sign-msix true --install-certificate false --signtool-options "/v /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com /sha1 $($certificate.Thumbprint)"

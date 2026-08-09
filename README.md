@@ -1,38 +1,39 @@
 # My Torrent
 
-Cliente desktop de torrents para Windows, com suporte a magnet links, arquivos `.torrent` locais e URLs HTTP(S) para arquivos `.torrent`.
+A compact Windows torrent client with support for magnet links, local `.torrent` files, and HTTP(S) torrent URLs.
 
-## Desenvolvimento
+## 🚀 Development
 
 ```powershell
 flutter pub get
 flutter run -d windows
 flutter test
-flutter build windows --release
-dart run msix:create
 ```
 
-## MSIX local
-
-Use PowerShell e mantenha a senha fora do repositório:
+Create a locally signed Windows package with:
 
 ```powershell
-$env:MSIX_CERTIFICATE_PASSWORD = 'uma-senha-segura'
-just certificate # Necessário apenas para criar ou exportar o PFX local.
 just msix
 ```
 
-`just msix` executa formatação, análise, testes, build Windows e cria o MSIX
-assinado com `certificates\torrent-desk-dev.pfx`.
+This command checks formatting, runs analysis and tests, builds the Windows app, and produces an MSIX signed with the local development certificate.
 
-O aplicativo usa `libtorrent_flutter`, licenciado sob GPL-3.0. Distribuições do aplicativo precisam permanecer compatíveis com essa licença.
+## 📦 Installation
 
-## Empacotamento
+GitHub Releases include the MSIX installer and its matching `my-torrent-dev.cer` certificate. Before installing a release, open an elevated PowerShell session and trust that release certificate:
 
-O workflow `.github/workflows/windows-msix.yml` valida formato, análise e testes, compila a versão Windows e publica o instalador `.msix` como artefato. O MSIX declara o protocolo `magnet` e a extensão `.torrent`.
+```powershell
+Import-Certificate -FilePath .\my-torrent-dev.cer -CertStoreLocation Cert:\LocalMachine\TrustedPeople
+```
 
-## Certificado de desenvolvimento
+Then install the `.msix` file. Import the certificate from each new release before updating an existing installation.
 
-O script `tool/create_dev_certificate.ps1` cria um certificado autoassinado para testes locais, válido por 20 anos, e exporta o PFX sem versionar a chave privada ou senha. O workflow assina o MSIX automaticamente quando os segredos `MSIX_CERTIFICATE_BASE64` e `MSIX_CERTIFICATE_PASSWORD` estão configurados; sem eles, gera um certificado de desenvolvimento automaticamente.
+## 🏷️ Releases
 
-O script `tool/install_dev_certificate.ps1` precisa ser executado como administrador para registrar a chave pública em `LocalMachine\TrustedPeople`, requisito para instalar localmente um MSIX assinado por certificado de desenvolvimento.
+Push a tag in the format `vMAJOR.MINOR.PATCH`, such as `v1.0.2`, to create a GitHub Release. Update `pubspec.yaml` first so its version matches the tag, for example `1.0.2+1`.
+
+The GitHub workflow creates a new self-signed `CN=My Torrent` certificate valid for 20 years, signs the MSIX, verifies it, and publishes both the installer and public certificate. No PFX file, password, secret, or environment variable is required.
+
+## ℹ️ Notes
+
+The MSIX package registers the `magnet` protocol and `.torrent` file extension. The application uses `libtorrent_flutter` and is distributed under GPL-3.0-compatible terms.

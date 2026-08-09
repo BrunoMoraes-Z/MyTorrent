@@ -1,7 +1,5 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)]
-    [Security.SecureString]$Password,
     [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\certificates'),
     [switch]$Replace
 )
@@ -13,7 +11,11 @@ $expiresAt = (Get-Date).AddYears(20)
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 
 $certificate = Get-ChildItem Cert:\CurrentUser\My |
-    Where-Object { $_.Subject -eq $subject -and $_.NotAfter -gt (Get-Date) } |
+    Where-Object {
+        $_.Subject -eq $subject -and
+        $_.HasPrivateKey -and
+        $_.NotAfter -gt (Get-Date).AddYears(19)
+    } |
     Select-Object -First 1
 
 if ($Replace -and $null -ne $certificate) {
@@ -38,10 +40,7 @@ if ($null -eq $certificate) {
         )
 }
 
-$pfxPath = Join-Path $OutputDirectory 'torrent-desk-dev.pfx'
-$cerPath = Join-Path $OutputDirectory 'torrent-desk-dev.cer'
-Export-PfxCertificate -Cert $certificate -FilePath $pfxPath -Password $Password -ChainOption EndEntityCertOnly | Out-Null
+$cerPath = Join-Path $OutputDirectory 'my-torrent-dev.cer'
 Export-Certificate -Cert $certificate -FilePath $cerPath -Type CERT | Out-Null
 
-Write-Host "Development certificate exported to $OutputDirectory."
-Write-Host 'The PFX password is intentionally not stored by the project.'
+Write-Host "Development certificate created in CurrentUser\My and exported to $cerPath."

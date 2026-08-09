@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$CertificatePath = (Join-Path $PSScriptRoot '..\certificates\torrent-desk-dev.cer')
+    [string]$CertificatePath = (Join-Path $PSScriptRoot '..\certificates\my-torrent-dev.cer')
 )
 
 $ErrorActionPreference = 'Stop'
