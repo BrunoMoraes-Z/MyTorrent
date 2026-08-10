@@ -115,8 +115,21 @@ jobs:
       - name: Trust release certificate chain for verification
         shell: pwsh
         run: |
-          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\TrustedPeople -Confirm:$false | Out-Null
-          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\Root -Confirm:$false | Out-Null
+          $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($env:CERTIFICATE_PATH)
+          foreach ($storeName in @('TrustedPeople', 'Root')) {
+            $store = [System.Security.Cryptography.X509Certificates.X509Store]::new(
+              [System.Security.Cryptography.X509Certificates.StoreName]::$storeName,
+              [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser
+            )
+            try {
+              $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+              $store.Add($certificate)
+            }
+            finally {
+              $store.Dispose()
+            }
+          }
+          $certificate.Dispose()
       - name: Verify signature
         shell: pwsh
         run: |
