@@ -31,9 +31,11 @@ Future<void> main() async {
   }
   final controller = await AppController.create(
     restartApplication: desktopManager.restart,
+    updateDesktopLanguage: desktopManager.updateLanguage,
   );
+  await desktopManager.updateLanguage(controller.settings.language);
   runApp(
-    TorrentDeskApp(
+    MyTorrent(
       controller: controller,
       initialSource: Platform.executableArguments.cast<String?>().firstWhere(
         (argument) =>

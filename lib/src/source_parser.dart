@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'models.dart';
+import 'app_error.dart';
 
 class TorrentSourceParser {
   const TorrentSourceParser();
@@ -8,9 +9,7 @@ class TorrentSourceParser {
   TorrentSource parse(String rawValue) {
     final value = rawValue.trim();
     if (value.isEmpty) {
-      throw const FormatException(
-        'Informe um link magnet, URL ou arquivo .torrent.',
-      );
+      throw const AppException(AppErrorCode.sourceRequired);
     }
 
     final uri = Uri.tryParse(value);
@@ -25,8 +24,6 @@ class TorrentSourceParser {
     if (value.toLowerCase().endsWith('.torrent') && File(value).existsSync()) {
       return TorrentSource(value: value, type: TorrentSourceType.file);
     }
-    throw const FormatException(
-      'Use um magnet, uma URL HTTP(S) ou um arquivo .torrent existente.',
-    );
+    throw const AppException(AppErrorCode.sourceInvalid);
   }
 }

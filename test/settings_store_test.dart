@@ -15,6 +15,7 @@ void main() {
       downloadDirectory: r'C:\Downloads',
       downloadLimitMb: 12.5,
       restoreOnLaunch: false,
+      language: AppLanguage.en,
     );
 
     await store.save(expected);
@@ -23,6 +24,7 @@ void main() {
     expect(restored.downloadDirectory, expected.downloadDirectory);
     expect(restored.downloadLimitMb, 12.5);
     expect(restored.restoreOnLaunch, isFalse);
+    expect(restored.language, AppLanguage.en);
     expect(
       File(
         '${directory.path}${Platform.pathSeparator}settings.json',

@@ -2093,7 +2093,7 @@
       "name": "Settings Screen",
       "clip": true,
       "width": 1100,
-      "height": 980,
+      "height": 1140,
       "fill": "$bg",
       "layout": "none",
       "children": [
@@ -2104,7 +2104,7 @@
           "y": 0,
           "name": "Settings Sidebar",
           "width": 210,
-          "height": 980,
+          "height": 1140,
           "fill": "$panel",
           "stroke": "$border",
           "strokeWidth": {
@@ -2245,7 +2245,7 @@
           "y": 0,
           "name": "Settings Main",
           "width": 890,
-          "height": 980,
+          "height": 1140,
           "layout": "vertical",
           "children": [
             {
@@ -2785,6 +2785,99 @@
                       ]
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Htoah",
+                  "name": "Settings Language",
+                  "width": "fill_container",
+                  "fill": "$panel",
+                  "cornerRadius": 8,
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 13,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ZC4NT",
+                      "name": "Language Heading",
+                      "fill": "$text",
+                      "content": "Idioma",
+                      "fontFamily": "$font",
+                      "fontSize": 15,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ztati",
+                      "name": "Language Description",
+                      "fill": "$muted",
+                      "content": "Escolha o idioma usado pelo aplicativo.",
+                      "fontFamily": "$font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "h6JNC",
+                      "name": "Language Selector",
+                      "width": "fill_container",
+                      "height": 40,
+                      "fill": "#0F0F11",
+                      "cornerRadius": 6,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "HOf14",
+                          "name": "Language Value",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "unPO1",
+                              "name": "Language Icon",
+                              "width": 15,
+                              "height": 15,
+                              "icon": "languages",
+                              "library": "lucide",
+                              "fill": "$muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "PniBF",
+                              "name": "Language Selection",
+                              "fill": "$text",
+                              "content": "Português (Brasil)",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "icon",
+                          "id": "E6pSIz",
+                          "name": "Language Selector Chevron",
+                          "width": 15,
+                          "height": 15,
+                          "icon": "chevron-down",
+                          "library": "lucide",
+                          "fill": "$muted"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -2795,13 +2888,14 @@
     {
       "type": "frame",
       "id": "fWZ5y",
-      "x": 2520,
-      "y": 800,
+      "x": 1360,
+      "y": 846,
       "name": "Application Icon",
       "clip": true,
       "width": 256,
       "height": 256,
       "fill": "#D6FF4D",
+      "cornerRadius": 24,
       "layout": "none",
       "children": [
         {
@@ -2859,7 +2953,7 @@
       "type": "frame",
       "id": "aAfJl",
       "x": 2520,
-      "y": 1136,
+      "y": 1219,
       "name": "Smart Import Prompt",
       "clip": true,
       "width": 1080,

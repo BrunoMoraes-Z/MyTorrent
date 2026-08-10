@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:my_torrent/src/app_error.dart';
 import 'package:my_torrent/src/download_destination.dart';
 
 void main() {
@@ -14,7 +15,13 @@ void main() {
   test('rejects invalid download folder names', () {
     expect(
       () => DownloadDestination.folderName(r'bad/name'),
-      throwsA(isA<FormatException>()),
+      throwsA(
+        isA<AppException>().having(
+          (error) => error.code,
+          'code',
+          AppErrorCode.folderNameInvalidCharacters,
+        ),
+      ),
     );
   });
 

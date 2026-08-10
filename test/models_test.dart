@@ -13,6 +13,15 @@ void main() {
       expect(restored.restoreOnLaunch, isTrue);
       expect(restored.enableDht, isFalse);
       expect(restored.fetchTrackers, isFalse);
+      expect(restored.language, AppLanguage.en);
+    });
+
+    test('defaults legacy settings without a language to English', () {
+      final restored = AppSettings.fromJson(<String, Object?>{
+        'downloadDirectory': r'C:\Downloads',
+      }, r'C:\Fallback');
+
+      expect(restored.language, AppLanguage.en);
     });
 
     test('clears explicit speed limits', () {
@@ -41,6 +50,17 @@ void main() {
 
       expect(restored.enableDht, isTrue);
       expect(restored.fetchTrackers, isTrue);
+    });
+
+    test('persists the selected application language', () {
+      const settings = AppSettings(
+        downloadDirectory: r'C:\Downloads',
+        language: AppLanguage.en,
+      );
+
+      final restored = AppSettings.fromJson(settings.toJson(), r'C:\Fallback');
+
+      expect(restored.language, AppLanguage.en);
     });
   });
 

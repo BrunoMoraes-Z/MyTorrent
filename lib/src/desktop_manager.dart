@@ -1,22 +1,37 @@
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../l10n/generated/app_localizations.dart';
+import 'models.dart';
+
 class DesktopManager with WindowListener, TrayListener {
+  AppLanguage _language = AppLanguage.en;
+
   Future<void> initialize() async {
     windowManager.addListener(this);
     await windowManager.setPreventClose(true);
     trayManager.addListener(this);
     final iconPath = _trayIconPath();
     await trayManager.setIcon(iconPath);
+    await updateLanguage(_language);
+  }
+
+  Future<void> updateLanguage(AppLanguage language) async {
+    _language = language;
+    final l10n = lookupAppLocalizations(switch (language) {
+      AppLanguage.ptBr => const Locale('pt', 'BR'),
+      AppLanguage.en => const Locale('en'),
+    });
     await trayManager.setToolTip('My Torrent');
     await trayManager.setContextMenu(
       Menu(
         items: <MenuItem>[
-          MenuItem(key: 'show', label: 'Abrir My Torrent'),
+          MenuItem(key: 'show', label: l10n.trayOpen),
           MenuItem.separator(),
-          MenuItem(key: 'exit', label: 'Encerrar'),
+          MenuItem(key: 'exit', label: l10n.trayExit),
         ],
       ),
     );

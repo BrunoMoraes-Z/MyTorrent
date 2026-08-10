@@ -1,3 +1,4 @@
+import 'package:my_torrent/src/app_error.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_torrent/src/models.dart';
 import 'package:my_torrent/src/source_parser.dart';
@@ -18,14 +19,26 @@ void main() {
   test('rejects unsupported input before polling', () {
     expect(
       () => parser.parse('not-a-torrent'),
-      throwsA(isA<FormatException>()),
+      throwsA(
+        isA<AppException>().having(
+          (error) => error.code,
+          'code',
+          AppErrorCode.sourceInvalid,
+        ),
+      ),
     );
   });
 
   test('rejects an HTTP URL that is not a torrent file', () {
     expect(
       () => parser.parse('https://example.com/download'),
-      throwsA(isA<FormatException>()),
+      throwsA(
+        isA<AppException>().having(
+          (error) => error.code,
+          'code',
+          AppErrorCode.sourceInvalid,
+        ),
+      ),
     );
   });
 }

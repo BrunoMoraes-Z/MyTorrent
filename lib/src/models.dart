@@ -2,6 +2,21 @@ enum TorrentSourceType { magnet, file, url }
 
 enum DownloadStatus { downloading, paused, completed, error, preparing }
 
+enum AppLanguage {
+  ptBr('pt_BR'),
+  en('en');
+
+  const AppLanguage(this.persistedValue);
+
+  final String persistedValue;
+
+  static AppLanguage fromPersistedValue(Object? value) => switch (value) {
+    'pt_BR' => AppLanguage.ptBr,
+    'en' => AppLanguage.en,
+    _ => AppLanguage.en,
+  };
+}
+
 class TorrentSource {
   const TorrentSource({required this.value, required this.type});
 
@@ -31,6 +46,7 @@ class AppSettings {
     this.notifyOnComplete = true,
     this.enableDht = false,
     this.fetchTrackers = false,
+    this.language = AppLanguage.en,
   });
 
   final String downloadDirectory;
@@ -41,6 +57,7 @@ class AppSettings {
   final bool notifyOnComplete;
   final bool enableDht;
   final bool fetchTrackers;
+  final AppLanguage language;
 
   AppSettings copyWith({
     String? downloadDirectory,
@@ -53,6 +70,7 @@ class AppSettings {
     bool? notifyOnComplete,
     bool? enableDht,
     bool? fetchTrackers,
+    AppLanguage? language,
   }) {
     return AppSettings(
       downloadDirectory: downloadDirectory ?? this.downloadDirectory,
@@ -68,6 +86,7 @@ class AppSettings {
       notifyOnComplete: notifyOnComplete ?? this.notifyOnComplete,
       enableDht: enableDht ?? this.enableDht,
       fetchTrackers: fetchTrackers ?? this.fetchTrackers,
+      language: language ?? this.language,
     );
   }
 
@@ -80,6 +99,7 @@ class AppSettings {
     'notifyOnComplete': notifyOnComplete,
     'enableDht': enableDht,
     'fetchTrackers': fetchTrackers,
+    'language': language.persistedValue,
   };
 
   factory AppSettings.fromJson(Map<String, Object?> json, String fallbackPath) {
@@ -93,6 +113,7 @@ class AppSettings {
       notifyOnComplete: json['notifyOnComplete'] as bool? ?? true,
       enableDht: json['enableDht'] as bool? ?? false,
       fetchTrackers: json['fetchTrackers'] as bool? ?? false,
+      language: AppLanguage.fromPersistedValue(json['language']),
     );
   }
 }

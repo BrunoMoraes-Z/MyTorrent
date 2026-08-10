@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/widgets.dart';
@@ -8,8 +7,11 @@ import 'package:protocol_handler/protocol_handler.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../l10n/generated/app_localizations.dart';
 import 'app_controller.dart';
+import 'app_error.dart';
 import 'import_detection_service.dart';
+import 'models.dart';
 import 'torrent_service.dart';
 
 const _accent = Color(0xffd6ff4d);
@@ -18,28 +20,56 @@ const _panel = Color(0xff111113);
 const _border = Color(0xff27272a);
 const _muted = Color(0xffa1a1aa);
 
-class TorrentDeskApp extends StatelessWidget {
-  const TorrentDeskApp({
-    super.key,
-    required this.controller,
-    this.initialSource,
-  });
+Locale _localeFor(AppLanguage language) => switch (language) {
+  AppLanguage.ptBr => const Locale('pt', 'BR'),
+  AppLanguage.en => const Locale('en'),
+};
+
+String _localizedError(AppLocalizations l10n, Object error) {
+  if (error is AppException) {
+    return switch (error.code) {
+      AppErrorCode.sourceRequired => l10n.errorSourceRequired,
+      AppErrorCode.sourceInvalid => l10n.errorSourceInvalid,
+      AppErrorCode.noSelectableFiles => l10n.errorNoSelectableFiles,
+      AppErrorCode.metadataTimeout => l10n.errorMetadataTimeout,
+      AppErrorCode.httpStatus => l10n.errorHttpStatus(error.statusCode ?? 0),
+      AppErrorCode.torrentFileTooLarge => l10n.errorTorrentFileTooLarge,
+      AppErrorCode.fileSelectionRequired => l10n.errorFileSelectionRequired,
+      AppErrorCode.destinationNotFound => l10n.errorDestinationNotFound,
+      AppErrorCode.downloadDirectoryNotFound =>
+        l10n.errorDownloadDirectoryNotFound,
+      AppErrorCode.folderNameRequired => l10n.errorFolderNameRequired,
+      AppErrorCode.folderNameInvalidCharacters =>
+        l10n.errorFolderNameInvalidCharacters,
+    };
+  }
+  return error.toString().replaceFirst('Exception: ', '');
+}
+
+class MyTorrent extends StatelessWidget {
+  const MyTorrent({super.key, required this.controller, this.initialSource});
 
   final AppController controller;
   final String? initialSource;
 
   @override
   Widget build(BuildContext context) {
-    return ShadApp(
-      title: 'My Torrent',
-      theme: ShadThemeData(
-        brightness: Brightness.dark,
-        colorScheme: const ShadZincColorScheme.dark(),
-      ),
-      backgroundColor: const Color(0xff09090b),
-      home: DashboardShell(
-        controller: controller,
-        initialSource: initialSource,
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) => ShadApp(
+        title: 'My Torrent',
+        locale: _localeFor(controller.settings.language),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: ShadThemeData(
+          brightness: Brightness.dark,
+          colorScheme: const ShadZincColorScheme.dark(),
+        ),
+        backgroundColor: const Color(0xff09090b),
+        home: DashboardShell(
+          controller: controller,
+          initialSource: initialSource,
+        ),
       ),
     );
   }
@@ -117,17 +147,16 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
 
   Future<void> _openSourceDialog() async {
     final sourceController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
     await showShadDialog<void>(
       context: context,
       builder: (dialogContext) => ShadDialog(
-        title: const Text('Adicionar torrent'),
-        description: const Text(
-          'Cole um magnet, URL .torrent ou escolha um arquivo local.',
-        ),
+        title: Text(l10n.addTorrent),
+        description: Text(l10n.addTorrentDescription),
         actions: <Widget>[
           ShadButton.outline(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           ShadButton(
             backgroundColor: _accent,
@@ -137,7 +166,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
               Navigator.of(dialogContext).pop();
               _prepareSource(value);
             },
-            child: const Text('Continuar'),
+            child: Text(l10n.continueAction),
           ),
         ],
         child: Column(
@@ -161,7 +190,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
                 }
               },
               leading: const Icon(LucideIcons.fileUp),
-              child: const Text('Escolher arquivo .torrent'),
+              child: Text(l10n.chooseTorrentFile),
             ),
           ],
         ),
@@ -171,6 +200,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
   }
 
   Future<void> _prepareSource(String source) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final prepared = await widget.controller.prepare(source);
       if (!mounted) return;
@@ -188,24 +218,17 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
         context: context,
         variant: ShadDialogVariant.alert,
         builder: (dialogContext) => ShadDialog.alert(
-          title: const Text('Não foi possível preparar o torrent'),
-          description: Text(_errorMessage(error)),
+          title: Text(l10n.prepareTorrentFailed),
+          description: Text(_localizedError(l10n, error)),
           actions: <Widget>[
             ShadButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Fechar'),
+              child: Text(l10n.close),
             ),
           ],
         ),
       );
     }
-  }
-
-  String _errorMessage(Object error) {
-    if (error is TimeoutException) {
-      return error.message?.toString() ?? 'Tempo limite excedido.';
-    }
-    return error.toString().replaceFirst('Exception: ', '');
   }
 
   @override
@@ -262,25 +285,22 @@ class ImportCandidateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isMagnet = candidate.type == ImportCandidateType.magnet;
     return ShadDialog(
-      title: Text(
-        isMagnet ? 'Link magnet encontrado' : 'Arquivo .torrent encontrado',
-      ),
+      title: Text(isMagnet ? l10n.magnetLinkFound : l10n.torrentFileFound),
       description: Text(
-        isMagnet
-            ? 'Detectado na área de transferência.'
-            : 'Detectado na pasta Downloads do Windows.',
+        isMagnet ? l10n.magnetDetected : l10n.torrentFileDetected,
       ),
       constraints: const BoxConstraints(maxWidth: 510),
       actions: <Widget>[
-        ShadButton.outline(onPressed: onIgnore, child: const Text('Ignorar')),
+        ShadButton.outline(onPressed: onIgnore, child: Text(l10n.ignore)),
         ShadButton(
           backgroundColor: _accent,
           foregroundColor: const Color(0xff111113),
           onPressed: onImport,
           leading: const Icon(LucideIcons.download, size: 16),
-          child: const Text('Importar'),
+          child: Text(l10n.import),
         ),
       ],
       child: Container(
@@ -319,6 +339,7 @@ class _WindowBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 42,
       child: Row(
@@ -330,7 +351,7 @@ class _WindowBar extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    settingsOpen ? 'Configurações' : 'Downloads',
+                    settingsOpen ? l10n.settings : l10n.downloads,
                     style: const TextStyle(color: _muted, fontSize: 12),
                   ),
                 ),
@@ -377,6 +398,7 @@ class _Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: 210,
       decoration: const BoxDecoration(
@@ -387,29 +409,32 @@ class _Sidebar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const Row(
+          Row(
             children: <Widget>[
               _BrandMark(),
               SizedBox(width: 10),
-              Text('My Torrent', style: TextStyle(fontWeight: FontWeight.w700)),
+              Text(
+                l10n.appTitle,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
             ],
           ),
           const SizedBox(height: 18),
           _NavigationItem(
-            label: 'Downloads',
+            label: l10n.downloads,
             icon: LucideIcons.list,
             selected: !settingsOpen,
             onPressed: onDownloads,
           ),
           _NavigationItem(
-            label: 'Configurações',
+            label: l10n.settings,
             icon: LucideIcons.settings,
             selected: settingsOpen,
             onPressed: onSettings,
           ),
           const Spacer(),
-          const Text(
-            'Motor conectado',
+          Text(
+            l10n.engineConnected,
             style: TextStyle(color: _muted, fontSize: 12),
           ),
           const SizedBox(height: 6),
@@ -427,7 +452,7 @@ class _Sidebar extends StatelessWidget {
               ),
               const SizedBox(width: 7),
               Text(
-                '$activeCount download(s) ativo(s)',
+                l10n.activeDownloads(activeCount),
                 style: const TextStyle(fontSize: 12),
               ),
             ],
@@ -500,6 +525,7 @@ class DownloadsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final downloads = controller.downloads;
     final active = downloads
         .where((item) => !item.isPaused && !item.isFinished)
@@ -514,17 +540,20 @@ class DownloadsView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Downloads',
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+                    l10n.downloads,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Acompanhe e gerencie seus torrents.',
-                    style: TextStyle(color: _muted, fontSize: 13),
+                    l10n.downloadsIntro,
+                    style: const TextStyle(color: _muted, fontSize: 13),
                   ),
                 ],
               ),
@@ -533,18 +562,18 @@ class DownloadsView extends StatelessWidget {
                 foregroundColor: const Color(0xff111113),
                 leading: const Icon(LucideIcons.plus, size: 16),
                 onPressed: onAdd,
-                child: const Text('Adicionar torrent'),
+                child: Text(l10n.addTorrent),
               ),
             ],
           ),
           const SizedBox(height: 18),
           Row(
             children: <Widget>[
-              _Metric(label: 'Baixando', value: '$active'),
+              _Metric(label: l10n.downloading, value: '$active'),
               const SizedBox(width: 10),
-              _Metric(label: 'Pausados', value: '$paused'),
+              _Metric(label: l10n.paused, value: '$paused'),
               const SizedBox(width: 10),
-              _Metric(label: 'Concluídos', value: '$complete'),
+              _Metric(label: l10n.completed, value: '$complete'),
             ],
           ),
           const SizedBox(height: 18),
@@ -556,10 +585,10 @@ class DownloadsView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: downloads.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'Nenhum download ainda.',
-                        style: TextStyle(color: _muted),
+                        l10n.noDownloads,
+                        style: const TextStyle(color: _muted),
                       ),
                     )
                   : ListView.separated(
@@ -617,23 +646,29 @@ class _DownloadHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: <Widget>[
-          Expanded(flex: 4, child: Text('NOME', style: _TableHeaderStyle())),
+          Expanded(
+            flex: 4,
+            child: Text(l10n.tableName, style: const _TableHeaderStyle()),
+          ),
           Expanded(
             flex: 2,
-            child: Text('PROGRESSO', style: _TableHeaderStyle()),
+            child: Text(l10n.tableProgress, style: const _TableHeaderStyle()),
           ),
-          Expanded(child: Text('VELOCIDADE', style: _TableHeaderStyle())),
+          Expanded(
+            child: Text(l10n.tableSpeed, style: const _TableHeaderStyle()),
+          ),
           SizedBox(
             width: 110,
-            child: Text('STATUS', style: _TableHeaderStyle()),
+            child: Text(l10n.tableStatus, style: const _TableHeaderStyle()),
           ),
           SizedBox(
             width: 126,
-            child: Text('AÇÕES', style: _TableHeaderStyle()),
+            child: Text(l10n.tableActions, style: const _TableHeaderStyle()),
           ),
         ],
       ),
@@ -659,7 +694,8 @@ class _DownloadRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = _status(torrent);
+    final l10n = AppLocalizations.of(context)!;
+    final state = _status(torrent, l10n);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -722,7 +758,7 @@ class _DownloadRow extends StatelessWidget {
             child: Text(
               state,
               style: TextStyle(
-                color: state == 'BAIXANDO' ? _accent : _muted,
+                color: state == l10n.statusDownloading ? _accent : _muted,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
               ),
@@ -768,16 +804,17 @@ class _DownloadRow extends StatelessWidget {
   }
 
   Future<void> _confirmRemoval(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     await showShadDialog<void>(
       context: context,
       variant: ShadDialogVariant.alert,
       builder: (dialogContext) => ShadDialog.alert(
-        title: const Text('Remover download?'),
-        description: Text('"${torrent.name}" será removido da lista.'),
+        title: Text(l10n.removeDownload),
+        description: Text(l10n.removeDownloadDescription(torrent.name)),
         actions: <Widget>[
           ShadButton.outline(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           ShadButton.destructive(
             onPressed: () async {
@@ -785,7 +822,7 @@ class _DownloadRow extends StatelessWidget {
               if (!dialogContext.mounted) return;
               Navigator.of(dialogContext).pop();
             },
-            child: const Text('Manter arquivos'),
+            child: Text(l10n.keepFiles),
           ),
           ShadButton.destructive(
             onPressed: () async {
@@ -793,18 +830,18 @@ class _DownloadRow extends StatelessWidget {
               if (!dialogContext.mounted) return;
               Navigator.of(dialogContext).pop();
             },
-            child: const Text('Apagar arquivos'),
+            child: Text(l10n.deleteFiles),
           ),
         ],
       ),
     );
   }
 
-  String _status(TorrentInfo info) {
-    if (info.errorMsg.isNotEmpty) return 'ERRO';
-    if (info.isFinished) return 'CONCLUÍDO';
-    if (info.isPaused) return 'PAUSADO';
-    return 'BAIXANDO';
+  String _status(TorrentInfo info, AppLocalizations l10n) {
+    if (info.errorMsg.isNotEmpty) return l10n.statusError;
+    if (info.isFinished) return l10n.statusCompleted;
+    if (info.isPaused) return l10n.statusPaused;
+    return l10n.statusDownloading;
   }
 
   String _formatRate(int bytesPerSecond) {
@@ -886,13 +923,14 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final files = widget.prepared.files;
     final total = files
         .where((file) => _selected.contains(file.index))
         .fold<int>(0, (total, file) => total + file.size);
     return ShadDialog(
-      title: const Text('Selecionar arquivos'),
-      description: Text('${files.length} arquivo(s) encontrados no torrent.'),
+      title: Text(l10n.selectFiles),
+      description: Text(l10n.torrentFilesFound(files.length)),
       constraints: const BoxConstraints(maxWidth: 700),
       actions: <Widget>[
         ShadButton.outline(
@@ -902,7 +940,7 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
                   widget.controller.cancelPreparation(widget.prepared);
                   Navigator.of(context).pop();
                 },
-          child: const Text('Cancelar'),
+          child: Text(l10n.cancel),
         ),
         ShadButton(
           backgroundColor: _accent,
@@ -910,7 +948,7 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
           enabled: _selected.isNotEmpty && !_starting,
           onPressed: _start,
           leading: const Icon(LucideIcons.download, size: 16),
-          child: Text(_starting ? 'Iniciando...' : 'Iniciar download'),
+          child: Text(_starting ? l10n.starting : l10n.startDownload),
         ),
       ],
       child: SizedBox(
@@ -932,7 +970,7 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
                       );
                   }),
                   label: Text(
-                    '${_selected.length} de ${files.length} arquivos selecionados',
+                    l10n.selectedFiles(_selected.length, files.length),
                   ),
                 ),
                 Text(
@@ -992,9 +1030,9 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
               ),
             ),
             const SizedBox(height: 14),
-            const Text(
-              'PASTA BASE',
-              style: TextStyle(
+            Text(
+              l10n.baseFolder,
+              style: const TextStyle(
                 color: _muted,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
@@ -1013,9 +1051,9 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
               ],
             ),
             const SizedBox(height: 12),
-            const Text(
-              'NOME DA PASTA',
-              style: TextStyle(
+            Text(
+              l10n.folderName,
+              style: const TextStyle(
                 color: _muted,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
@@ -1054,6 +1092,7 @@ class _SettingsViewState extends State<SettingsView> {
   late bool _notify;
   late bool _enableDht;
   late bool _fetchTrackers;
+  late AppLanguage _language;
   String? _message;
 
   @override
@@ -1071,6 +1110,7 @@ class _SettingsViewState extends State<SettingsView> {
     _notify = settings.notifyOnComplete;
     _enableDht = settings.enableDht;
     _fetchTrackers = settings.fetchTrackers;
+    _language = settings.language;
   }
 
   @override
@@ -1092,7 +1132,9 @@ class _SettingsViewState extends State<SettingsView> {
     final download = double.tryParse(_downloadLimit.text.replaceAll(',', '.'));
     final upload = double.tryParse(_uploadLimit.text.replaceAll(',', '.'));
     if (download != null && download <= 0 || upload != null && upload <= 0) {
-      setState(() => _message = 'Os limites devem ser maiores que zero.');
+      setState(
+        () => _message = AppLocalizations.of(context)!.limitsMustBePositive,
+      );
       return;
     }
     final shouldRestart =
@@ -1110,41 +1152,43 @@ class _SettingsViewState extends State<SettingsView> {
           notifyOnComplete: _notify,
           enableDht: _enableDht,
           fetchTrackers: _fetchTrackers,
+          language: _language,
         ),
       );
       if (shouldRestart) {
         await widget.controller.restartForTrackerSettings();
         return;
       }
-      if (mounted) setState(() => _message = 'Configurações salvas.');
-    } on FileSystemException catch (error) {
-      setState(() => _message = error.message);
+      if (mounted) {
+        setState(() => _message = AppLocalizations.of(context)!.settingsSaved);
+      }
     } catch (error) {
       setState(
-        () => _message = 'Não foi possível reiniciar o aplicativo: $error',
+        () => _message = AppLocalizations.of(
+          context,
+        )!.restartFailed(_localizedError(AppLocalizations.of(context)!, error)),
       );
     }
   }
 
   Future<bool> _confirmRestart() async {
+    final l10n = AppLocalizations.of(context)!;
     final restart = await showShadDialog<bool>(
       context: context,
       variant: ShadDialogVariant.alert,
       builder: (dialogContext) => ShadDialog.alert(
-        title: const Text('Reiniciar para aplicar?'),
-        description: const Text(
-          'Os downloads ativos serão pausados, o app será reiniciado e eles serão retomados automaticamente.',
-        ),
+        title: Text(l10n.restartToApply),
+        description: Text(l10n.restartDescription),
         actions: <Widget>[
           ShadButton.outline(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           ShadButton(
             backgroundColor: _accent,
             foregroundColor: const Color(0xff111113),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Reiniciar agora'),
+            child: Text(l10n.restartNow),
           ),
         ],
       ),
@@ -1154,48 +1198,48 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(28),
       child: ListView(
         children: <Widget>[
-          const Text(
-            'Configurações',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+          Text(
+            l10n.settings,
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Controle como seus torrents são baixados e armazenados.',
-            style: TextStyle(color: _muted, fontSize: 13),
+          Text(
+            l10n.settingsIntro,
+            style: const TextStyle(color: _muted, fontSize: 13),
           ),
           const SizedBox(height: 20),
           _SettingsPanel(
-            title: 'Local de download',
-            description: 'Este diretório será usado para novos downloads.',
+            title: l10n.downloadLocation,
+            description: l10n.downloadLocationDescription,
             child: Row(
               children: <Widget>[
                 Expanded(child: ShadInput(controller: _directory)),
                 const SizedBox(width: 8),
                 ShadButton.outline(
                   onPressed: _chooseDirectory,
-                  child: const Text('Escolher'),
+                  child: Text(l10n.choose),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 12),
           _SettingsPanel(
-            title: 'Limites de velocidade',
-            description:
-                'Deixe em branco para não limitar a velocidade global.',
+            title: l10n.speedLimits,
+            description: l10n.speedLimitsDescription,
             child: Column(
               children: <Widget>[
                 _LabeledInput(
-                  label: 'Download máximo (MB/s)',
+                  label: l10n.maximumDownload,
                   controller: _downloadLimit,
                 ),
                 const SizedBox(height: 10),
                 _LabeledInput(
-                  label: 'Upload máximo (MB/s)',
+                  label: l10n.maximumUpload,
                   controller: _uploadLimit,
                 ),
               ],
@@ -1203,22 +1247,21 @@ class _SettingsViewState extends State<SettingsView> {
           ),
           const SizedBox(height: 12),
           _SettingsPanel(
-            title: 'Descoberta de pares',
-            description:
-                'Defina como o app encontra trackers e pares para novos torrents.',
+            title: l10n.peerDiscovery,
+            description: l10n.peerDiscoveryDescription,
             child: Column(
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('Usar DHT'),
+                          Text(l10n.useDht),
                           SizedBox(height: 3),
                           Text(
-                            'Encontra pares na rede pública descentralizada. Pode conectar a IPs desconhecidos.',
-                            style: TextStyle(color: _muted, fontSize: 11),
+                            l10n.useDhtDescription,
+                            style: const TextStyle(color: _muted, fontSize: 11),
                           ),
                         ],
                       ),
@@ -1232,15 +1275,15 @@ class _SettingsViewState extends State<SettingsView> {
                 const SizedBox(height: 14),
                 Row(
                   children: <Widget>[
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('Buscar trackers públicos'),
+                          Text(l10n.fetchPublicTrackers),
                           SizedBox(height: 3),
                           Text(
-                            'Baixa uma lista pública ao reiniciar. Salvar esta alteração pausa e retoma seus downloads.',
-                            style: TextStyle(color: _muted, fontSize: 11),
+                            l10n.fetchPublicTrackersDescription,
+                            style: const TextStyle(color: _muted, fontSize: 11),
                           ),
                         ],
                       ),
@@ -1257,15 +1300,14 @@ class _SettingsViewState extends State<SettingsView> {
           ),
           const SizedBox(height: 12),
           _SettingsPanel(
-            title: 'Comportamento',
-            description:
-                'As transferências continuam enquanto o app estiver na bandeja.',
+            title: l10n.behavior,
+            description: l10n.behaviorDescription,
             child: Column(
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    const Text('Restaurar downloads ao iniciar'),
+                    Text(l10n.restoreDownloads),
                     ShadSwitch(
                       value: _restore,
                       onChanged: (value) => setState(() => _restore = value),
@@ -1276,7 +1318,7 @@ class _SettingsViewState extends State<SettingsView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    const Text('Notificar ao concluir download'),
+                    Text(l10n.notifyOnComplete),
                     ShadSwitch(
                       value: _notify,
                       onChanged: (value) => setState(() => _notify = value),
@@ -1284,6 +1326,27 @@ class _SettingsViewState extends State<SettingsView> {
                   ],
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          _SettingsPanel(
+            title: l10n.language,
+            description: l10n.languageDescription,
+            child: ShadSelect<AppLanguage>(
+              initialValue: _language,
+              selectedOptionBuilder: (context, language) =>
+                  Text(_languageLabel(l10n, language)),
+              options: AppLanguage.values
+                  .map(
+                    (language) => ShadOption<AppLanguage>(
+                      value: language,
+                      child: Text(_languageLabel(l10n, language)),
+                    ),
+                  )
+                  .toList(growable: false),
+              onChanged: (language) {
+                if (language != null) setState(() => _language = language);
+              },
             ),
           ),
           if (_message != null) ...<Widget>[
@@ -1300,7 +1363,7 @@ class _SettingsViewState extends State<SettingsView> {
               backgroundColor: _accent,
               foregroundColor: const Color(0xff111113),
               onPressed: _save,
-              child: const Text('Salvar configurações'),
+              child: Text(l10n.saveSettings),
             ),
           ),
         ],
@@ -1355,6 +1418,7 @@ class _LabeledInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: <Widget>[
         Expanded(child: Text(label)),
@@ -1362,13 +1426,19 @@ class _LabeledInput extends StatelessWidget {
           width: 180,
           child: ShadInput(
             controller: controller,
-            placeholder: const Text('Sem limite'),
+            placeholder: Text(l10n.unlimited),
           ),
         ),
       ],
     );
   }
 }
+
+String _languageLabel(AppLocalizations l10n, AppLanguage language) =>
+    switch (language) {
+      AppLanguage.ptBr => l10n.portugueseBrazil,
+      AppLanguage.en => l10n.english,
+    };
 
 String _formatSize(int bytes) {
   if (bytes < 1024) return '$bytes B';

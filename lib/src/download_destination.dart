@@ -1,17 +1,17 @@
 import 'dart:io';
 
+import 'app_error.dart';
+
 class DownloadDestination {
   const DownloadDestination._();
 
   static String folderName(String value) {
     final name = value.trim();
     if (name.isEmpty || name == '.' || name == '..') {
-      throw const FormatException('Informe um nome de pasta válido.');
+      throw const AppException(AppErrorCode.folderNameRequired);
     }
     if (name.contains(RegExp(r'[<>:"/\\|?*]'))) {
-      throw const FormatException(
-        'O nome da pasta contém caracteres inválidos.',
-      );
+      throw const AppException(AppErrorCode.folderNameInvalidCharacters);
     }
     return name;
   }

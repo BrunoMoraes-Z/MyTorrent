@@ -5,6 +5,7 @@ import 'package:libtorrent_flutter/libtorrent_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'models.dart';
+import 'app_error.dart';
 import 'download_destination.dart';
 import 'priority_mapper.dart';
 import 'source_parser.dart';
@@ -75,7 +76,7 @@ class TorrentService {
           )
           .toList(growable: false);
       if (files.isEmpty) {
-        throw StateError('O torrent não contém arquivos selecionáveis.');
+        throw const AppException(AppErrorCode.noSelectableFiles);
       }
       return PreparedTorrent(
         id: id,
@@ -123,9 +124,8 @@ class TorrentService {
         .first
         .timeout(
           timeout,
-          onTimeout: () => throw TimeoutException(
-            'Não foi possível obter os metadados do torrent a tempo.',
-          ),
+          onTimeout: () =>
+              throw const AppException(AppErrorCode.metadataTimeout),
         );
   }
 
@@ -135,13 +135,13 @@ class TorrentService {
       final request = await client.getUrl(uri).timeout(timeout);
       final response = await request.close().timeout(timeout);
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw HttpException(
-          'A URL retornou HTTP ${response.statusCode}.',
-          uri: uri,
+        throw AppException(
+          AppErrorCode.httpStatus,
+          statusCode: response.statusCode,
         );
       }
       if (response.contentLength > 10 * 1024 * 1024) {
-        throw const HttpException('O arquivo .torrent excede 10 MB.');
+        throw const AppException(AppErrorCode.torrentFileTooLarge);
       }
       final cache = await getTemporaryDirectory();
       final target = File(

@@ -6,6 +6,7 @@ import 'package:libtorrent_flutter/libtorrent_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'models.dart';
+import 'app_error.dart';
 import 'download_session_store.dart';
 import 'download_destination.dart';
 import 'import_detection_service.dart';
@@ -19,6 +20,7 @@ class AppController extends ChangeNotifier {
     this._service,
     this._importDetection,
     this._restartApplication,
+    this._updateDesktopLanguage,
     this.settings,
   );
 
@@ -27,6 +29,7 @@ class AppController extends ChangeNotifier {
   final TorrentService _service;
   final ImportDetectionService _importDetection;
   final Future<void> Function() _restartApplication;
+  final Future<void> Function(AppLanguage) _updateDesktopLanguage;
   StreamSubscription<Map<int, TorrentInfo>>? _updatesSubscription;
   final Map<int, DownloadSession> _activeSessions = <int, DownloadSession>{};
   final List<DownloadSession> _savedSessions = <DownloadSession>[];
@@ -45,6 +48,7 @@ class AppController extends ChangeNotifier {
 
   static Future<AppController> create({
     required Future<void> Function() restartApplication,
+    required Future<void> Function(AppLanguage) updateDesktopLanguage,
   }) async {
     final downloadDirectory = await _defaultDownloadDirectory();
     final supportDirectory = await getApplicationSupportDirectory();
@@ -66,6 +70,7 @@ class AppController extends ChangeNotifier {
       service,
       importDetection,
       restartApplication,
+      updateDesktopLanguage,
       settings,
     );
     controller._updatesSubscription = service.updates.listen((items) {
@@ -107,13 +112,11 @@ class AppController extends ChangeNotifier {
     String folderName,
   ) async {
     if (selected.isEmpty) {
-      throw StateError(
-        'Selecione ao menos um arquivo para iniciar o download.',
-      );
+      throw const AppException(AppErrorCode.fileSelectionRequired);
     }
     final parent = Directory(parentDirectory.trim());
     if (!await parent.exists()) {
-      throw FileSystemException('A pasta de destino não existe.', parent.path);
+      throw const AppException(AppErrorCode.destinationNotFound);
     }
     final directory = DownloadDestination.path(parent.path, folderName);
     await Directory(directory).create(recursive: true);
@@ -169,16 +172,17 @@ class AppController extends ChangeNotifier {
   Future<void> saveSettings(AppSettings updated) async {
     final directory = Directory(updated.downloadDirectory);
     if (!await directory.exists()) {
-      throw FileSystemException(
-        'A pasta de download não existe.',
-        directory.path,
-      );
+      throw const AppException(AppErrorCode.downloadDirectoryNotFound);
     }
     final dhtChanged = updated.enableDht != settings.enableDht;
+    final languageChanged = updated.language != settings.language;
     settings = updated;
     if (dhtChanged) _service.setDhtEnabled(updated.enableDht);
     _service.setLimits(updated);
     await _settingsStore.save(updated);
+    if (languageChanged) {
+      await _updateDesktopLanguage(updated.language);
+    }
     notifyListeners();
   }
 
