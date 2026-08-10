@@ -112,9 +112,11 @@ jobs:
           "MSIX_PATH=$($installers[0].FullName)" | Add-Content -Path $env:GITHUB_ENV
           "CERTIFICATE_PATH=$($certificates[0].FullName)" | Add-Content -Path $env:GITHUB_ENV
           "RELEASE_TAG=$releaseTag" | Add-Content -Path $env:GITHUB_ENV
-      - name: Trust release certificate for verification
+      - name: Trust release certificate chain for verification
         shell: pwsh
-        run: Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
+        run: |
+          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
+          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
       - name: Verify signature
         shell: pwsh
         run: |
