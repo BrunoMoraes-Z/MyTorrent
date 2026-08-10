@@ -115,8 +115,8 @@ jobs:
       - name: Trust release certificate chain for verification
         shell: pwsh
         run: |
-          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
-          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
+          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\TrustedPeople -Confirm:$false | Out-Null
+          Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\Root -Confirm:$false | Out-Null
       - name: Verify signature
         shell: pwsh
         run: |
