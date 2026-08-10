@@ -18,6 +18,28 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get
+      - name: Install prebuilt libtorrent
+        shell: pwsh
+        run: |
+          $pubCache = if ($env:PUB_CACHE) { $env:PUB_CACHE } else { Join-Path $env:LOCALAPPDATA 'Pub\Cache' }
+          $packageDirectory = Join-Path $pubCache 'hosted\pub.dev\libtorrent_flutter-1.9.2'
+          $prebuiltDirectory = Join-Path $packageDirectory 'prebuilt\windows'
+          $archive = Join-Path $env:RUNNER_TEMP 'windows-native-lib-x64.zip'
+          $expectedHash = '0692551cf9c12ed9c15766df1cded89a615f9d340148030e50f4e8f0c9d299d2'
+
+          if (-not (Test-Path -LiteralPath $packageDirectory -PathType Container)) {
+            throw "libtorrent_flutter was not found at $packageDirectory."
+          }
+
+          Invoke-WebRequest -Uri 'https://github.com/ayman708-UX/libtorrent_flutter/releases/download/v1.9.2/windows-native-lib-x64.zip' -OutFile $archive
+          if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $expectedHash.ToUpperInvariant()) {
+            throw 'The downloaded libtorrent archive checksum does not match the published release asset.'
+          }
+
+          Expand-Archive -LiteralPath $archive -DestinationPath $prebuiltDirectory -Force
+          if (-not (Test-Path -LiteralPath (Join-Path $prebuiltDirectory 'x64\libtorrent_flutter.dll') -PathType Leaf)) {
+            throw 'The libtorrent archive did not contain the expected x64 DLL.'
+          }
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
       - name: Analyze
