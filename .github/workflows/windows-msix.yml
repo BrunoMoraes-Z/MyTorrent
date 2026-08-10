@@ -86,7 +86,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) }}
     needs: build
     runs-on: windows-latest
     permissions:
@@ -108,8 +108,10 @@ jobs:
           if ($certificates.Count -ne 1) {
             throw "Expected one certificate file, found $($certificates.Count)."
           }
+          $releaseTag = if ($env:GITHUB_REF -like 'refs/tags/v*') { $env:GITHUB_REF_NAME } else { "build-$env:GITHUB_RUN_NUMBER" }
           "MSIX_PATH=$($installers[0].FullName)" | Add-Content -Path $env:GITHUB_ENV
           "CERTIFICATE_PATH=$($certificates[0].FullName)" | Add-Content -Path $env:GITHUB_ENV
+          "RELEASE_TAG=$releaseTag" | Add-Content -Path $env:GITHUB_ENV
       - name: Trust release certificate for verification
         shell: pwsh
         run: Import-Certificate -FilePath $env:CERTIFICATE_PATH -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
@@ -123,6 +125,9 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ env.RELEASE_TAG }}
           files: |
             ${{ env.MSIX_PATH }}
             ${{ env.CERTIFICATE_PATH }}
