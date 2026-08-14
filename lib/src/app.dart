@@ -947,7 +947,9 @@ class _DownloadRow extends StatelessWidget {
                 ShadIconButton.ghost(
                   width: 30,
                   height: 30,
-                  onPressed: torrent.isPaused
+                  onPressed: torrent.isFinished
+                      ? null
+                      : torrent.isPaused
                       ? () async => controller.resume(torrent.id)
                       : () async => controller.pause(torrent.id),
                   iconSize: 15,

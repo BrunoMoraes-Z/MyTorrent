@@ -23,6 +23,11 @@ void main() {
       selectedIndexes: <int>[1, 2],
       resumeOnLaunch: false,
     );
+    const completed = CompletedDownload(
+      name: 'Finished',
+      directory: r'C:\Downloads\Finished',
+      totalSize: 512,
+    );
 
     await store.save(
       const DownloadSessionSnapshot(
@@ -33,6 +38,7 @@ void main() {
     await store.save(
       const DownloadSessionSnapshot(
         sessions: <DownloadSession>[second],
+        completedDownloads: <CompletedDownload>[completed],
         restartRequested: false,
       ),
     );
@@ -43,6 +49,7 @@ void main() {
     expect(restored.sessions, hasLength(1));
     expect(restored.sessions.single.source, second.source);
     expect(restored.sessions.single.selectedIndexes, <int>[1, 2]);
+    expect(restored.completedDownloads.single.name, 'Finished');
   });
 
   test('ignores malformed persisted sessions', () async {

@@ -155,6 +155,7 @@ class DownloadSession {
     required this.selectedIndexes,
     required this.resumeOnLaunch,
     this.contentDirectory,
+    this.torrentRoot,
     this.rootLinkPath,
   });
 
@@ -163,6 +164,7 @@ class DownloadSession {
   final List<int> selectedIndexes;
   final bool resumeOnLaunch;
   final String? contentDirectory;
+  final String? torrentRoot;
   final String? rootLinkPath;
 
   DownloadSession copyWith({bool? resumeOnLaunch}) => DownloadSession(
@@ -171,6 +173,7 @@ class DownloadSession {
     selectedIndexes: selectedIndexes,
     resumeOnLaunch: resumeOnLaunch ?? this.resumeOnLaunch,
     contentDirectory: contentDirectory,
+    torrentRoot: torrentRoot,
     rootLinkPath: rootLinkPath,
   );
 
@@ -180,6 +183,7 @@ class DownloadSession {
     'selectedIndexes': selectedIndexes,
     'resumeOnLaunch': resumeOnLaunch,
     'contentDirectory': contentDirectory,
+    'torrentRoot': torrentRoot,
     'rootLinkPath': rootLinkPath,
   };
 
@@ -204,7 +208,44 @@ class DownloadSession {
       selectedIndexes: indexes,
       resumeOnLaunch: json['resumeOnLaunch'] as bool? ?? true,
       contentDirectory: json['contentDirectory'] as String?,
+      torrentRoot: json['torrentRoot'] as String?,
       rootLinkPath: json['rootLinkPath'] as String?,
+    );
+  }
+}
+
+class CompletedDownload {
+  const CompletedDownload({
+    required this.name,
+    required this.directory,
+    required this.totalSize,
+  });
+
+  final String name;
+  final String directory;
+  final int totalSize;
+
+  Map<String, Object?> toJson() => <String, Object?>{
+    'name': name,
+    'directory': directory,
+    'totalSize': totalSize,
+  };
+
+  factory CompletedDownload.fromJson(Map<String, Object?> json) {
+    final name = json['name'];
+    final directory = json['directory'];
+    final totalSize = json['totalSize'];
+    if (name is! String ||
+        directory is! String ||
+        totalSize is! num ||
+        totalSize < 0 ||
+        totalSize != totalSize.roundToDouble()) {
+      throw const FormatException('Download concluído inválido.');
+    }
+    return CompletedDownload(
+      name: name,
+      directory: directory,
+      totalSize: totalSize.toInt(),
     );
   }
 }

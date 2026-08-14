@@ -13,7 +13,7 @@ import 'download_destination.dart';
 import 'import_detection_service.dart';
 import 'settings_store.dart';
 import 'torrent_service.dart';
-import 'windows/torrent_root_link.dart';
+import 'windows/torrent_folder_renamer.dart';
 
 class AppController extends ChangeNotifier {
   AppController._(
@@ -39,6 +39,11 @@ class AppController extends ChangeNotifier {
   StreamSubscription<Map<int, TorrentInfo>>? _updatesSubscription;
   final Map<int, DownloadSession> _activeSessions = <int, DownloadSession>{};
   final List<DownloadSession> _savedSessions = <DownloadSession>[];
+  final Map<int, TorrentInfo> _completedDownloads = <int, TorrentInfo>{};
+  final Map<int, CompletedDownload> _completedRecords =
+      <int, CompletedDownload>{};
+  final Set<int> _finalizingDownloads = <int>{};
+  int _nextCompletedId = -1;
 
   AppSettings settings;
   Map<int, TorrentInfo> _downloads = const <int, TorrentInfo>{};
@@ -48,7 +53,10 @@ class AppController extends ChangeNotifier {
   Stream<TorrentInfo> get downloadCompletions => _downloadCompletions.stream;
 
   List<TorrentInfo> get downloads {
-    final values = _downloads.values.toList();
+    final values = <int, TorrentInfo>{
+      ..._downloads,
+      ..._completedDownloads,
+    }.values.toList();
     values.sort((a, b) => b.id.compareTo(a.id));
     return values;
   }
@@ -85,9 +93,13 @@ class AppController extends ChangeNotifier {
     controller._updatesSubscription = service.updates.listen((items) {
       final completed = controller._completionTracker.observe(items);
       controller._downloads = items;
-      if (controller.settings.notifyOnComplete) {
-        for (final torrent in completed) {
-          controller._downloadCompletions.add(torrent);
+      for (final torrent in completed) {
+        unawaited(controller._finalizeCompletedDownload(torrent));
+      }
+      for (final torrent in items.values) {
+        if (torrent.isFinished &&
+            controller._activeSessions[torrent.id]?.rootLinkPath != null) {
+          unawaited(controller._finalizeCompletedDownload(torrent));
         }
       }
       controller.notifyListeners();
@@ -143,24 +155,17 @@ class AppController extends ChangeNotifier {
     final active = prepared.directory == engineDirectory
         ? prepared
         : await _relocatePreparation(prepared, engineDirectory);
-    String? rootLinkPath;
-    try {
-      rootLinkPath = active.usesTorrentRoot
-          ? await TorrentRootLink.ensure(
-              baseDirectory: engineDirectory,
-              torrentRoot: active.name,
-              destinationDirectory: contentDirectory,
-            )
-          : null;
-    } catch (_) {
+    if (active.usesTorrentRoot &&
+        active.name != folderName.trim() &&
+        await Directory(contentDirectory).exists()) {
       if (active.id != prepared.id) _service.cancelPreparation(active);
-      rethrow;
+      throw const AppException(AppErrorCode.downloadFolderConflict);
     }
     await _start(
       active,
       selected,
       contentDirectory: contentDirectory,
-      rootLinkPath: rootLinkPath,
+      torrentRoot: active.usesTorrentRoot ? active.name : null,
     );
   }
 
@@ -176,7 +181,7 @@ class AppController extends ChangeNotifier {
     PreparedTorrent prepared,
     Set<int> selected, {
     required String contentDirectory,
-    String? rootLinkPath,
+    String? torrentRoot,
   }) async {
     _service.start(prepared, selected);
     final session = DownloadSession(
@@ -185,7 +190,7 @@ class AppController extends ChangeNotifier {
       selectedIndexes: selected.toList()..sort(),
       resumeOnLaunch: true,
       contentDirectory: contentDirectory,
-      rootLinkPath: rootLinkPath,
+      torrentRoot: torrentRoot,
     );
     _activeSessions[prepared.id] = session;
     _savedSessions.add(session);
@@ -205,10 +210,19 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> remove(int id, {required bool deleteFiles}) async {
+    final completed = _completedDownloads.remove(id);
+    if (completed != null) {
+      if (deleteFiles) {
+        await Directory(completed.savePath).delete(recursive: true);
+      }
+      _completedRecords.remove(id);
+      await _saveSessions();
+      notifyListeners();
+      return;
+    }
     _service.remove(id, deleteFiles: deleteFiles);
     final session = _activeSessions.remove(id);
     if (session != null) {
-      await TorrentRootLink.remove(session.rootLinkPath);
       _savedSessions.remove(session);
       await _saveSessions();
     }
@@ -219,6 +233,103 @@ class AppController extends ChangeNotifier {
 
   String downloadDirectory(TorrentInfo torrent) =>
       _activeSessions[torrent.id]?.contentDirectory ?? torrent.savePath;
+
+  Future<void> _finalizeCompletedDownload(TorrentInfo torrent) async {
+    if (!_finalizingDownloads.add(torrent.id)) return;
+    try {
+      final session = _activeSessions[torrent.id];
+      final destination = session?.contentDirectory;
+      final source = session?.torrentRoot == null
+          ? null
+          : DownloadDestination.savePath(
+              session!.directory,
+              session.torrentRoot!,
+            );
+      final shouldFinalize =
+          session?.rootLinkPath != null ||
+          (source != null &&
+              destination != null &&
+              !_samePath(source, destination));
+      if (!shouldFinalize) {
+        _notifyDownloadComplete(torrent);
+        return;
+      }
+
+      _service.remove(torrent.id, deleteFiles: false);
+      _activeSessions.remove(torrent.id);
+      _savedSessions.remove(session);
+      var completedPath = source ?? torrent.savePath;
+      try {
+        if (session?.rootLinkPath != null) {
+          await TorrentFolderRenamer.removeLegacyLink(session!.rootLinkPath);
+          completedPath = destination ?? completedPath;
+        } else {
+          await TorrentFolderRenamer.rename(
+            sourceDirectory: source!,
+            destinationDirectory: destination!,
+          );
+          completedPath = destination;
+        }
+      } catch (error) {
+        lastError = error;
+      }
+      final archived = torrent.copyWith(
+        savePath: completedPath,
+        isPaused: true,
+      );
+      _archiveCompletedDownload(
+        archived,
+        CompletedDownload(
+          name: archived.name,
+          directory: completedPath,
+          totalSize: archived.totalWanted,
+        ),
+      );
+      await _saveSessions();
+      _notifyDownloadComplete(_completedDownloads[archived.id]!);
+      notifyListeners();
+    } finally {
+      _finalizingDownloads.remove(torrent.id);
+    }
+  }
+
+  void _notifyDownloadComplete(TorrentInfo torrent) {
+    if (settings.notifyOnComplete) _downloadCompletions.add(torrent);
+  }
+
+  bool _samePath(String first, String second) =>
+      first.replaceAll('/', '\\').toLowerCase() ==
+      second.replaceAll('/', '\\').toLowerCase();
+
+  void _archiveCompletedDownload(
+    TorrentInfo torrent,
+    CompletedDownload record, {
+    int? id,
+  }) {
+    final archiveId = id ?? torrent.id;
+    _completedDownloads[archiveId] = archiveId == torrent.id
+        ? torrent
+        : TorrentInfo(
+            id: archiveId,
+            name: record.name,
+            savePath: record.directory,
+            errorMsg: '',
+            state: TorrentState.finished,
+            progress: 1,
+            downloadRate: 0,
+            uploadRate: 0,
+            totalDone: record.totalSize,
+            totalWanted: record.totalSize,
+            totalUploaded: 0,
+            numPeers: 0,
+            numSeeds: 0,
+            isPaused: true,
+            isFinished: true,
+            hasMetadata: true,
+            queuePosition: -1,
+          );
+    _completedRecords[archiveId] = record;
+  }
 
   Future<void> saveSettings(AppSettings updated) async {
     final directory = Directory(updated.downloadDirectory);
@@ -262,6 +373,31 @@ class AppController extends ChangeNotifier {
 
   Future<void> _restoreSessions(DownloadSessionSnapshot snapshot) async {
     _savedSessions.addAll(snapshot.sessions);
+    for (final record in snapshot.completedDownloads) {
+      _archiveCompletedDownload(
+        TorrentInfo(
+          id: _nextCompletedId,
+          name: record.name,
+          savePath: record.directory,
+          errorMsg: '',
+          state: TorrentState.finished,
+          progress: 1,
+          downloadRate: 0,
+          uploadRate: 0,
+          totalDone: record.totalSize,
+          totalWanted: record.totalSize,
+          totalUploaded: 0,
+          numPeers: 0,
+          numSeeds: 0,
+          isPaused: true,
+          isFinished: true,
+          hasMetadata: true,
+          queuePosition: -1,
+        ),
+        record,
+      );
+      _nextCompletedId--;
+    }
     if (!settings.restoreOnLaunch && !snapshot.restartRequested) return;
     for (final session in snapshot.sessions) {
       try {
@@ -278,14 +414,6 @@ class AppController extends ChangeNotifier {
           _service.cancelPreparation(prepared);
           continue;
         }
-        final rootLinkPath = prepared.usesTorrentRoot
-            ? await TorrentRootLink.ensure(
-                baseDirectory: prepared.directory,
-                torrentRoot: prepared.name,
-                destinationDirectory:
-                    session.contentDirectory ?? prepared.directory,
-              )
-            : null;
         _service.pause(prepared.id);
         _service.setFilePriorities(prepared, selected);
         _service.recheck(prepared.id);
@@ -300,7 +428,8 @@ class AppController extends ChangeNotifier {
           selectedIndexes: session.selectedIndexes,
           resumeOnLaunch: session.resumeOnLaunch,
           contentDirectory: session.contentDirectory ?? prepared.directory,
-          rootLinkPath: rootLinkPath,
+          torrentRoot: session.torrentRoot,
+          rootLinkPath: session.rootLinkPath,
         );
       } catch (_) {
         // A missing source must not prevent other persisted downloads restoring.
@@ -329,6 +458,7 @@ class AppController extends ChangeNotifier {
       _sessionStore.save(
         DownloadSessionSnapshot(
           sessions: _savedSessions,
+          completedDownloads: _completedRecords.values.toList(),
           restartRequested: restartRequested,
         ),
       );
