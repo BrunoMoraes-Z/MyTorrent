@@ -332,7 +332,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorDownloadFolderConflict =>
-      'A folder with the torrent\'s original name already exists in the selected destination.';
+      'The selected folder already contains files.';
 
   @override
   String get errorDownloadDirectoryNotFound =>

@@ -30,4 +30,32 @@ void main() {
       'payload',
     );
   });
+
+  test('reuses an existing empty destination folder', () async {
+    final temporary = await Directory.systemTemp.createTemp('my_torrent_test_');
+    addTearDown(() => temporary.delete(recursive: true));
+    final source = Directory(
+      '${temporary.path}${Platform.pathSeparator}Original torrent',
+    );
+    final destination = Directory(
+      '${temporary.path}${Platform.pathSeparator}Custom download',
+    );
+    await source.create();
+    await destination.create();
+    await File(
+      '${source.path}${Platform.pathSeparator}payload.txt',
+    ).writeAsString('payload');
+
+    await TorrentFolderRenamer.rename(
+      sourceDirectory: source.path,
+      destinationDirectory: destination.path,
+    );
+
+    expect(
+      await File(
+        '${destination.path}${Platform.pathSeparator}payload.txt',
+      ).readAsString(),
+      'payload',
+    );
+  });
 }

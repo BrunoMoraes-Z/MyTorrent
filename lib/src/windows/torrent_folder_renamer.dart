@@ -12,10 +12,19 @@ class TorrentFolderRenamer {
     if (_samePath(sourceDirectory, destinationDirectory)) return;
     final source = Directory(sourceDirectory);
     final destination = Directory(destinationDirectory);
-    if (!await source.exists() || await destination.exists()) {
+    if (!await source.exists() ||
+        !await canUseDestination(destinationDirectory)) {
       throw const AppException(AppErrorCode.downloadFolderConflict);
     }
+    if (await destination.exists()) await destination.delete();
     await source.rename(destinationDirectory);
+  }
+
+  static Future<bool> canUseDestination(String directory) async {
+    final type = await FileSystemEntity.type(directory, followLinks: false);
+    if (type == FileSystemEntityType.notFound) return true;
+    if (type != FileSystemEntityType.directory) return false;
+    return await Directory(directory).list(followLinks: false).isEmpty;
   }
 
   static Future<void> removeLegacyLink(String? path) async {

@@ -660,7 +660,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorDownloadFolderConflict.
   ///
   /// In pt_BR, this message translates to:
-  /// **'Já existe uma pasta com o nome original do torrent no destino escolhido.'**
+  /// **'A pasta escolhida já contém arquivos.'**
   String get errorDownloadFolderConflict;
 
   /// No description provided for @errorDownloadDirectoryNotFound.

@@ -157,7 +157,7 @@ class AppController extends ChangeNotifier {
         : await _relocatePreparation(prepared, engineDirectory);
     if (active.usesTorrentRoot &&
         active.name != folderName.trim() &&
-        await Directory(contentDirectory).exists()) {
+        !await TorrentFolderRenamer.canUseDestination(contentDirectory)) {
       if (active.id != prepared.id) _service.cancelPreparation(active);
       throw const AppException(AppErrorCode.downloadFolderConflict);
     }
