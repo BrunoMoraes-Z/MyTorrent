@@ -331,6 +331,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get errorDownloadFolderInvalid => 'Informe um nome de pasta válido.';
 
   @override
+  String get errorDownloadFolderConflict =>
+      'Já existe uma pasta com o nome original do torrent no destino escolhido.';
+
+  @override
   String get errorDownloadDirectoryNotFound =>
       'A pasta de download não existe.';
 }
@@ -660,6 +664,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get errorDownloadFolderInvalid => 'Informe um nome de pasta válido.';
+
+  @override
+  String get errorDownloadFolderConflict =>
+      'Já existe uma pasta com o nome original do torrent no destino escolhido.';
 
   @override
   String get errorDownloadDirectoryNotFound =>

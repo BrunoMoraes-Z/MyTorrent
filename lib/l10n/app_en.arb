@@ -99,5 +99,6 @@
   "errorFileSelectionRequired": "Select at least one file to start the download.",
   "errorDestinationNotFound": "The destination folder does not exist.",
   "errorDownloadFolderInvalid": "Enter a valid folder name.",
+  "errorDownloadFolderConflict": "A folder with the torrent's original name already exists in the selected destination.",
   "errorDownloadDirectoryNotFound": "The download folder does not exist."
 }

@@ -40,6 +40,7 @@ String _localizedError(AppLocalizations l10n, Object error) {
       AppErrorCode.fileSelectionRequired => l10n.errorFileSelectionRequired,
       AppErrorCode.destinationNotFound => l10n.errorDestinationNotFound,
       AppErrorCode.downloadFolderInvalid => l10n.errorDownloadFolderInvalid,
+      AppErrorCode.downloadFolderConflict => l10n.errorDownloadFolderConflict,
       AppErrorCode.downloadDirectoryNotFound =>
         l10n.errorDownloadDirectoryNotFound,
     };
@@ -887,7 +888,7 @@ class _DownloadRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  torrent.savePath,
+                  controller.downloadDirectory(torrent),
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: _muted, fontSize: 11),
                 ),
@@ -958,7 +959,9 @@ class _DownloadRow extends StatelessWidget {
                   width: 30,
                   height: 30,
                   foregroundColor: _muted,
-                  onPressed: () => controller.openFolder(torrent.savePath),
+                  onPressed: () => controller.openFolder(
+                    controller.downloadDirectory(torrent),
+                  ),
                   iconSize: 15,
                   icon: const Icon(LucideIcons.folderOpen),
                 ),

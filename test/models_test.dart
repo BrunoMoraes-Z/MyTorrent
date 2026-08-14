@@ -117,6 +117,24 @@ void main() {
       expect(restored.directory, session.directory);
       expect(restored.selectedIndexes, <int>[0, 3]);
       expect(restored.resumeOnLaunch, isFalse);
+      expect(restored.contentDirectory, isNull);
+      expect(restored.rootLinkPath, isNull);
+    });
+
+    test('persists the visible download directory and torrent root link', () {
+      const session = DownloadSession(
+        source: 'magnet:?xt=urn:btih:abc',
+        directory: r'C:\Downloads',
+        selectedIndexes: <int>[0, 3],
+        resumeOnLaunch: true,
+        contentDirectory: r'C:\Downloads\Custom',
+        rootLinkPath: r'C:\Downloads\Original torrent',
+      );
+
+      final restored = DownloadSession.fromJson(session.toJson());
+
+      expect(restored.contentDirectory, r'C:\Downloads\Custom');
+      expect(restored.rootLinkPath, r'C:\Downloads\Original torrent');
     });
   });
 }

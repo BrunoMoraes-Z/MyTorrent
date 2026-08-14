@@ -8,6 +8,7 @@ enum AppErrorCode {
   fileSelectionRequired,
   destinationNotFound,
   downloadFolderInvalid,
+  downloadFolderConflict,
   downloadDirectoryNotFound,
 }
 

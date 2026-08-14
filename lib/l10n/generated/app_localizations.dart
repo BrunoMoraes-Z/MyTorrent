@@ -657,6 +657,12 @@ abstract class AppLocalizations {
   /// **'Informe um nome de pasta válido.'**
   String get errorDownloadFolderInvalid;
 
+  /// No description provided for @errorDownloadFolderConflict.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Já existe uma pasta com o nome original do torrent no destino escolhido.'**
+  String get errorDownloadFolderConflict;
+
   /// No description provided for @errorDownloadDirectoryNotFound.
   ///
   /// In pt_BR, this message translates to:

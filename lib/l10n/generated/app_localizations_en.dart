@@ -331,6 +331,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorDownloadFolderInvalid => 'Enter a valid folder name.';
 
   @override
+  String get errorDownloadFolderConflict =>
+      'A folder with the torrent\'s original name already exists in the selected destination.';
+
+  @override
   String get errorDownloadDirectoryNotFound =>
       'The download folder does not exist.';
 }

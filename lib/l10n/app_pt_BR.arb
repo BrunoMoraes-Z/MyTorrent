@@ -99,5 +99,6 @@
   "errorFileSelectionRequired": "Selecione ao menos um arquivo para iniciar o download.",
   "errorDestinationNotFound": "A pasta de destino não existe.",
   "errorDownloadFolderInvalid": "Informe um nome de pasta válido.",
+  "errorDownloadFolderConflict": "Já existe uma pasta com o nome original do torrent no destino escolhido.",
   "errorDownloadDirectoryNotFound": "A pasta de download não existe."
 }

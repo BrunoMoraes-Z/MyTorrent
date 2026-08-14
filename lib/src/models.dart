@@ -154,18 +154,24 @@ class DownloadSession {
     required this.directory,
     required this.selectedIndexes,
     required this.resumeOnLaunch,
+    this.contentDirectory,
+    this.rootLinkPath,
   });
 
   final String source;
   final String directory;
   final List<int> selectedIndexes;
   final bool resumeOnLaunch;
+  final String? contentDirectory;
+  final String? rootLinkPath;
 
   DownloadSession copyWith({bool? resumeOnLaunch}) => DownloadSession(
     source: source,
     directory: directory,
     selectedIndexes: selectedIndexes,
     resumeOnLaunch: resumeOnLaunch ?? this.resumeOnLaunch,
+    contentDirectory: contentDirectory,
+    rootLinkPath: rootLinkPath,
   );
 
   Map<String, Object?> toJson() => <String, Object?>{
@@ -173,6 +179,8 @@ class DownloadSession {
     'directory': directory,
     'selectedIndexes': selectedIndexes,
     'resumeOnLaunch': resumeOnLaunch,
+    'contentDirectory': contentDirectory,
+    'rootLinkPath': rootLinkPath,
   };
 
   factory DownloadSession.fromJson(Map<String, Object?> json) {
@@ -195,6 +203,8 @@ class DownloadSession {
       directory: directory,
       selectedIndexes: indexes,
       resumeOnLaunch: json['resumeOnLaunch'] as bool? ?? true,
+      contentDirectory: json['contentDirectory'] as String?,
+      rootLinkPath: json['rootLinkPath'] as String?,
     );
   }
 }

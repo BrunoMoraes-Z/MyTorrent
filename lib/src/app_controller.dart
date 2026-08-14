@@ -13,6 +13,7 @@ import 'download_destination.dart';
 import 'import_detection_service.dart';
 import 'settings_store.dart';
 import 'torrent_service.dart';
+import 'windows/torrent_root_link.dart';
 
 class AppController extends ChangeNotifier {
   AppController._(
@@ -132,27 +133,59 @@ class AppController extends ChangeNotifier {
     if (!await parent.exists()) {
       throw const AppException(AppErrorCode.destinationNotFound);
     }
-    final directory = DownloadDestination.savePath(parent.path, folderName);
-    await Directory(directory).create(recursive: true);
-    if (directory == prepared.directory) {
-      await _start(prepared, selected);
-      return;
-    }
-    _service.cancelPreparation(prepared);
-    final relocated = await prepare(
-      prepared.source.value,
-      directory: directory,
+    final contentDirectory = DownloadDestination.savePath(
+      parent.path,
+      folderName,
     );
-    await _start(relocated, selected);
+    final engineDirectory = prepared.usesTorrentRoot
+        ? parent.path
+        : contentDirectory;
+    final active = prepared.directory == engineDirectory
+        ? prepared
+        : await _relocatePreparation(prepared, engineDirectory);
+    String? rootLinkPath;
+    try {
+      rootLinkPath = active.usesTorrentRoot
+          ? await TorrentRootLink.ensure(
+              baseDirectory: engineDirectory,
+              torrentRoot: active.name,
+              destinationDirectory: contentDirectory,
+            )
+          : null;
+    } catch (_) {
+      if (active.id != prepared.id) _service.cancelPreparation(active);
+      rethrow;
+    }
+    await _start(
+      active,
+      selected,
+      contentDirectory: contentDirectory,
+      rootLinkPath: rootLinkPath,
+    );
   }
 
-  Future<void> _start(PreparedTorrent prepared, Set<int> selected) async {
+  Future<PreparedTorrent> _relocatePreparation(
+    PreparedTorrent prepared,
+    String directory,
+  ) async {
+    _service.cancelPreparation(prepared);
+    return prepare(prepared.source.value, directory: directory);
+  }
+
+  Future<void> _start(
+    PreparedTorrent prepared,
+    Set<int> selected, {
+    required String contentDirectory,
+    String? rootLinkPath,
+  }) async {
     _service.start(prepared, selected);
     final session = DownloadSession(
       source: prepared.source.value,
       directory: prepared.directory,
       selectedIndexes: selected.toList()..sort(),
       resumeOnLaunch: true,
+      contentDirectory: contentDirectory,
+      rootLinkPath: rootLinkPath,
     );
     _activeSessions[prepared.id] = session;
     _savedSessions.add(session);
@@ -175,6 +208,7 @@ class AppController extends ChangeNotifier {
     _service.remove(id, deleteFiles: deleteFiles);
     final session = _activeSessions.remove(id);
     if (session != null) {
+      await TorrentRootLink.remove(session.rootLinkPath);
       _savedSessions.remove(session);
       await _saveSessions();
     }
@@ -182,6 +216,9 @@ class AppController extends ChangeNotifier {
 
   Future<void> openFolder(String directory) =>
       Process.start('explorer.exe', <String>[directory]);
+
+  String downloadDirectory(TorrentInfo torrent) =>
+      _activeSessions[torrent.id]?.contentDirectory ?? torrent.savePath;
 
   Future<void> saveSettings(AppSettings updated) async {
     final directory = Directory(updated.downloadDirectory);
@@ -241,6 +278,14 @@ class AppController extends ChangeNotifier {
           _service.cancelPreparation(prepared);
           continue;
         }
+        final rootLinkPath = prepared.usesTorrentRoot
+            ? await TorrentRootLink.ensure(
+                baseDirectory: prepared.directory,
+                torrentRoot: prepared.name,
+                destinationDirectory:
+                    session.contentDirectory ?? prepared.directory,
+              )
+            : null;
         _service.pause(prepared.id);
         _service.setFilePriorities(prepared, selected);
         _service.recheck(prepared.id);
@@ -249,7 +294,14 @@ class AppController extends ChangeNotifier {
         } else {
           _service.pause(prepared.id);
         }
-        _activeSessions[prepared.id] = session;
+        _activeSessions[prepared.id] = DownloadSession(
+          source: session.source,
+          directory: prepared.directory,
+          selectedIndexes: session.selectedIndexes,
+          resumeOnLaunch: session.resumeOnLaunch,
+          contentDirectory: session.contentDirectory ?? prepared.directory,
+          rootLinkPath: rootLinkPath,
+        );
       } catch (_) {
         // A missing source must not prevent other persisted downloads restoring.
       }

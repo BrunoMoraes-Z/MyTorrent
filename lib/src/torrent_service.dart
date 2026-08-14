@@ -18,6 +18,7 @@ class PreparedTorrent {
     required this.files,
     required this.directory,
     required this.name,
+    required this.usesTorrentRoot,
   });
 
   final int id;
@@ -25,6 +26,7 @@ class PreparedTorrent {
   final List<DownloadFile> files;
   final String directory;
   final String name;
+  final bool usesTorrentRoot;
 }
 
 class TorrentService {
@@ -87,6 +89,7 @@ class TorrentService {
         name: DownloadDestination.suggestedFolderName(
           _engine.torrents[id]?.name ?? files.first.name,
         ),
+        usesTorrentRoot: files.length > 1,
       );
     } catch (_) {
       _engine.removeTorrent(id, deleteFiles: false);
