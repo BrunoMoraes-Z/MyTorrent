@@ -15,8 +15,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get addTorrent => 'Adicionar torrent';
 
   @override
-  String get addTorrentDescription =>
-      'Cole um magnet, URL .torrent ou escolha um arquivo local.';
+  String get addTorrentDescription => 'Cole um magnet, URL .torrent ou escolha um arquivo local.';
 
   @override
   String get cancel => 'Cancelar';
@@ -158,9 +157,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get baseFolder => 'PASTA BASE';
 
   @override
-  String get folderName => 'NOME DA PASTA';
-
-  @override
   String get limitsMustBePositive => 'Os limites devem ser maiores que zero.';
 
   @override
@@ -175,22 +171,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get restartToApply => 'Reiniciar para aplicar?';
 
   @override
-  String get restartDescription =>
-      'Os downloads ativos serão pausados, o app será reiniciado e eles serão retomados automaticamente.';
+  String get restartDescription => 'Os downloads ativos serão pausados, o app será reiniciado e eles serão retomados automaticamente.';
 
   @override
   String get restartNow => 'Reiniciar agora';
 
   @override
-  String get settingsIntro =>
-      'Controle como seus torrents são baixados e armazenados.';
+  String get settingsIntro => 'Controle como seus torrents são baixados e armazenados.';
 
   @override
   String get downloadLocation => 'Local de download';
 
   @override
-  String get downloadLocationDescription =>
-      'Este diretório será usado para novos downloads.';
+  String get downloadLocationDescription => 'Este diretório será usado para novos downloads.';
 
   @override
   String get choose => 'Escolher';
@@ -199,8 +192,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get speedLimits => 'Limites de velocidade';
 
   @override
-  String get speedLimitsDescription =>
-      'Deixe em branco para não limitar a velocidade global.';
+  String get speedLimitsDescription => 'Deixe em branco para não limitar a velocidade global.';
 
   @override
   String get maximumDownload => 'Download máximo (MB/s)';
@@ -215,29 +207,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get peerDiscovery => 'Descoberta de pares';
 
   @override
-  String get peerDiscoveryDescription =>
-      'Defina como o app encontra trackers e pares para novos torrents.';
+  String get peerDiscoveryDescription => 'Defina como o app encontra trackers e pares para novos torrents.';
 
   @override
   String get useDht => 'Usar DHT';
 
   @override
-  String get useDhtDescription =>
-      'Encontra pares na rede pública descentralizada. Pode conectar a IPs desconhecidos.';
+  String get useDhtDescription => 'Encontra pares na rede pública descentralizada. Pode conectar a IPs desconhecidos.';
 
   @override
   String get fetchPublicTrackers => 'Buscar trackers públicos';
 
   @override
-  String get fetchPublicTrackersDescription =>
-      'Baixa uma lista pública ao reiniciar. Salvar esta alteração pausa e retoma seus downloads.';
+  String get fetchPublicTrackersDescription => 'Baixa uma lista pública ao reiniciar. Salvar esta alteração pausa e retoma seus downloads.';
 
   @override
   String get behavior => 'Comportamento';
 
   @override
-  String get behaviorDescription =>
-      'As transferências continuam enquanto o app estiver na bandeja.';
+  String get behaviorDescription => 'As transferências continuam enquanto o app estiver na bandeja.';
 
   @override
   String get restoreDownloads => 'Restaurar downloads ao iniciar';
@@ -267,20 +255,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trayExit => 'Encerrar';
 
   @override
-  String get errorSourceRequired =>
-      'Informe um link magnet, URL ou arquivo .torrent.';
+  String get errorSourceRequired => 'Informe um link magnet, URL ou arquivo .torrent.';
 
   @override
-  String get errorSourceInvalid =>
-      'Use um magnet, uma URL HTTP(S) ou um arquivo .torrent existente.';
+  String get errorSourceInvalid => 'Use um magnet, uma URL HTTP(S) ou um arquivo .torrent existente.';
 
   @override
-  String get errorNoSelectableFiles =>
-      'O torrent não contém arquivos selecionáveis.';
+  String get errorNoSelectableFiles => 'O torrent não contém arquivos selecionáveis.';
 
   @override
-  String get errorMetadataTimeout =>
-      'Não foi possível obter os metadados do torrent a tempo.';
+  String get errorMetadataTimeout => 'Não foi possível obter os metadados do torrent a tempo.';
 
   @override
   String errorHttpStatus(int statusCode) {
@@ -291,27 +275,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get errorTorrentFileTooLarge => 'O arquivo .torrent excede 10 MB.';
 
   @override
-  String get errorFileSelectionRequired =>
-      'Selecione ao menos um arquivo para iniciar o download.';
+  String get errorFileSelectionRequired => 'Selecione ao menos um arquivo para iniciar o download.';
 
   @override
   String get errorDestinationNotFound => 'A pasta de destino não existe.';
 
   @override
-  String get errorDownloadDirectoryNotFound =>
-      'A pasta de download não existe.';
-
-  @override
-  String get errorFolderNameRequired => 'Informe um nome de pasta válido.';
-
-  @override
-  String get errorFolderNameInvalidCharacters =>
-      'O nome da pasta contém caracteres inválidos.';
+  String get errorDownloadDirectoryNotFound => 'A pasta de download não existe.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
 class AppLocalizationsPtBr extends AppLocalizationsPt {
-  AppLocalizationsPtBr() : super('pt_BR');
+  AppLocalizationsPtBr(): super('pt_BR');
 
   @override
   String get appTitle => 'My Torrent';
@@ -320,8 +295,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get addTorrent => 'Adicionar torrent';
 
   @override
-  String get addTorrentDescription =>
-      'Cole um magnet, URL .torrent ou escolha um arquivo local.';
+  String get addTorrentDescription => 'Cole um magnet, URL .torrent ou escolha um arquivo local.';
 
   @override
   String get cancel => 'Cancelar';
@@ -463,9 +437,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get baseFolder => 'PASTA BASE';
 
   @override
-  String get folderName => 'NOME DA PASTA';
-
-  @override
   String get limitsMustBePositive => 'Os limites devem ser maiores que zero.';
 
   @override
@@ -480,22 +451,19 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get restartToApply => 'Reiniciar para aplicar?';
 
   @override
-  String get restartDescription =>
-      'Os downloads ativos serão pausados, o app será reiniciado e eles serão retomados automaticamente.';
+  String get restartDescription => 'Os downloads ativos serão pausados, o app será reiniciado e eles serão retomados automaticamente.';
 
   @override
   String get restartNow => 'Reiniciar agora';
 
   @override
-  String get settingsIntro =>
-      'Controle como seus torrents são baixados e armazenados.';
+  String get settingsIntro => 'Controle como seus torrents são baixados e armazenados.';
 
   @override
   String get downloadLocation => 'Local de download';
 
   @override
-  String get downloadLocationDescription =>
-      'Este diretório será usado para novos downloads.';
+  String get downloadLocationDescription => 'Este diretório será usado para novos downloads.';
 
   @override
   String get choose => 'Escolher';
@@ -504,8 +472,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get speedLimits => 'Limites de velocidade';
 
   @override
-  String get speedLimitsDescription =>
-      'Deixe em branco para não limitar a velocidade global.';
+  String get speedLimitsDescription => 'Deixe em branco para não limitar a velocidade global.';
 
   @override
   String get maximumDownload => 'Download máximo (MB/s)';
@@ -520,29 +487,25 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get peerDiscovery => 'Descoberta de pares';
 
   @override
-  String get peerDiscoveryDescription =>
-      'Defina como o app encontra trackers e pares para novos torrents.';
+  String get peerDiscoveryDescription => 'Defina como o app encontra trackers e pares para novos torrents.';
 
   @override
   String get useDht => 'Usar DHT';
 
   @override
-  String get useDhtDescription =>
-      'Encontra pares na rede pública descentralizada. Pode conectar a IPs desconhecidos.';
+  String get useDhtDescription => 'Encontra pares na rede pública descentralizada. Pode conectar a IPs desconhecidos.';
 
   @override
   String get fetchPublicTrackers => 'Buscar trackers públicos';
 
   @override
-  String get fetchPublicTrackersDescription =>
-      'Baixa uma lista pública ao reiniciar. Salvar esta alteração pausa e retoma seus downloads.';
+  String get fetchPublicTrackersDescription => 'Baixa uma lista pública ao reiniciar. Salvar esta alteração pausa e retoma seus downloads.';
 
   @override
   String get behavior => 'Comportamento';
 
   @override
-  String get behaviorDescription =>
-      'As transferências continuam enquanto o app estiver na bandeja.';
+  String get behaviorDescription => 'As transferências continuam enquanto o app estiver na bandeja.';
 
   @override
   String get restoreDownloads => 'Restaurar downloads ao iniciar';
@@ -572,20 +535,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get trayExit => 'Encerrar';
 
   @override
-  String get errorSourceRequired =>
-      'Informe um link magnet, URL ou arquivo .torrent.';
+  String get errorSourceRequired => 'Informe um link magnet, URL ou arquivo .torrent.';
 
   @override
-  String get errorSourceInvalid =>
-      'Use um magnet, uma URL HTTP(S) ou um arquivo .torrent existente.';
+  String get errorSourceInvalid => 'Use um magnet, uma URL HTTP(S) ou um arquivo .torrent existente.';
 
   @override
-  String get errorNoSelectableFiles =>
-      'O torrent não contém arquivos selecionáveis.';
+  String get errorNoSelectableFiles => 'O torrent não contém arquivos selecionáveis.';
 
   @override
-  String get errorMetadataTimeout =>
-      'Não foi possível obter os metadados do torrent a tempo.';
+  String get errorMetadataTimeout => 'Não foi possível obter os metadados do torrent a tempo.';
 
   @override
   String errorHttpStatus(int statusCode) {
@@ -596,20 +555,11 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get errorTorrentFileTooLarge => 'O arquivo .torrent excede 10 MB.';
 
   @override
-  String get errorFileSelectionRequired =>
-      'Selecione ao menos um arquivo para iniciar o download.';
+  String get errorFileSelectionRequired => 'Selecione ao menos um arquivo para iniciar o download.';
 
   @override
   String get errorDestinationNotFound => 'A pasta de destino não existe.';
 
   @override
-  String get errorDownloadDirectoryNotFound =>
-      'A pasta de download não existe.';
-
-  @override
-  String get errorFolderNameRequired => 'Informe um nome de pasta válido.';
-
-  @override
-  String get errorFolderNameInvalidCharacters =>
-      'O nome da pasta contém caracteres inválidos.';
+  String get errorDownloadDirectoryNotFound => 'A pasta de download não existe.';
 }

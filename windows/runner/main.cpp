@@ -12,7 +12,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   HWND hwnd = ::FindWindow(L"FLUTTER_RUNNER_WIN32_WINDOW", L"My Torrent");
   if (hwnd != nullptr) {
     DispatchToProtocolHandler(hwnd);
-    ::ShowWindow(hwnd, SW_NORMAL);
+    ::ShowWindow(hwnd, ::IsIconic(hwnd) ? SW_RESTORE : SW_SHOW);
     ::SetForegroundWindow(hwnd);
     return EXIT_SUCCESS;
   }

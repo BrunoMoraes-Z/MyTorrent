@@ -46,7 +46,6 @@
   "selectedFiles": "{selected} de {total} arquivos selecionados",
   "@selectedFiles": {"placeholders": {"selected": {"type": "num"}, "total": {"type": "num"}}},
   "baseFolder": "PASTA BASE",
-  "folderName": "NOME DA PASTA",
   "limitsMustBePositive": "Os limites devem ser maiores que zero.",
   "settingsSaved": "Configurações salvas.",
   "restartFailed": "Não foi possível reiniciar o aplicativo: {error}",
@@ -89,7 +88,5 @@
   "errorTorrentFileTooLarge": "O arquivo .torrent excede 10 MB.",
   "errorFileSelectionRequired": "Selecione ao menos um arquivo para iniciar o download.",
   "errorDestinationNotFound": "A pasta de destino não existe.",
-  "errorDownloadDirectoryNotFound": "A pasta de download não existe.",
-  "errorFolderNameRequired": "Informe um nome de pasta válido.",
-  "errorFolderNameInvalidCharacters": "O nome da pasta contém caracteres inválidos."
+  "errorDownloadDirectoryNotFound": "A pasta de download não existe."
 }

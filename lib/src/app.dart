@@ -8,9 +8,12 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../l10n/generated/app_localizations.dart';
+import 'activation_source.dart';
 import 'app_controller.dart';
 import 'app_error.dart';
+import 'desktop_manager.dart';
 import 'import_detection_service.dart';
+import 'import_notification_service.dart';
 import 'models.dart';
 import 'torrent_service.dart';
 
@@ -38,18 +41,23 @@ String _localizedError(AppLocalizations l10n, Object error) {
       AppErrorCode.destinationNotFound => l10n.errorDestinationNotFound,
       AppErrorCode.downloadDirectoryNotFound =>
         l10n.errorDownloadDirectoryNotFound,
-      AppErrorCode.folderNameRequired => l10n.errorFolderNameRequired,
-      AppErrorCode.folderNameInvalidCharacters =>
-        l10n.errorFolderNameInvalidCharacters,
     };
   }
   return error.toString().replaceFirst('Exception: ', '');
 }
 
 class MyTorrent extends StatelessWidget {
-  const MyTorrent({super.key, required this.controller, this.initialSource});
+  const MyTorrent({
+    super.key,
+    required this.controller,
+    required this.desktopManager,
+    required this.notificationService,
+    this.initialSource,
+  });
 
   final AppController controller;
+  final DesktopManager desktopManager;
+  final ImportNotificationService notificationService;
   final String? initialSource;
 
   @override
@@ -68,6 +76,8 @@ class MyTorrent extends StatelessWidget {
         backgroundColor: const Color(0xff09090b),
         home: DashboardShell(
           controller: controller,
+          desktopManager: desktopManager,
+          notificationService: notificationService,
           initialSource: initialSource,
         ),
       ),
@@ -79,10 +89,14 @@ class DashboardShell extends StatefulWidget {
   const DashboardShell({
     super.key,
     required this.controller,
+    required this.desktopManager,
+    required this.notificationService,
     this.initialSource,
   });
 
   final AppController controller;
+  final DesktopManager desktopManager;
+  final ImportNotificationService notificationService;
   final String? initialSource;
 
   @override
@@ -92,20 +106,32 @@ class DashboardShell extends StatefulWidget {
 class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
   bool _settingsOpen = false;
   final List<ImportCandidate> _importQueue = <ImportCandidate>[];
+  final List<_QueuedSource> _sourceQueue = <_QueuedSource>[];
   StreamSubscription<ImportCandidate>? _importSubscription;
+  StreamSubscription<ImportCandidate>? _notificationSubscription;
   bool _showingImportPrompt = false;
+  bool _preparingSource = false;
+  String? _currentImportSource;
 
   @override
   void initState() {
     super.initState();
     protocolHandler.addListener(this);
     _importSubscription = widget.controller.importCandidates.listen(
-      _queueImportCandidate,
+      _onImportCandidate,
+    );
+    _notificationSubscription = widget.notificationService.activations.listen(
+      _onNotificationActivation,
     );
     final source = widget.initialSource;
     if (source != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _queueSource(source));
+    }
+    final notificationCandidate = widget.notificationService
+        .takeInitialCandidate();
+    if (notificationCandidate != null) {
       WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _prepareSource(source),
+        (_) => _onNotificationActivation(notificationCandidate),
       );
     }
   }
@@ -113,14 +139,42 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
   @override
   void dispose() {
     _importSubscription?.cancel();
+    _notificationSubscription?.cancel();
     protocolHandler.removeListener(this);
     super.dispose();
   }
 
   @override
-  void onProtocolUrlReceived(String url) => _prepareSource(url);
+  void onProtocolUrlReceived(String url) {
+    final source = activationSource(<String>[url]);
+    if (source == null) return;
+    unawaited(widget.desktopManager.showWindow());
+    _queueSource(source);
+  }
+
+  void _onImportCandidate(ImportCandidate candidate) {
+    final l10n = AppLocalizations.of(context)!;
+    unawaited(
+      widget.notificationService.showCandidate(
+        candidate: candidate,
+        title: candidate.type == ImportCandidateType.magnet
+            ? l10n.magnetLinkFound
+            : l10n.torrentFileFound,
+      ),
+    );
+    _queueImportCandidate(candidate);
+  }
+
+  void _onNotificationActivation(ImportCandidate candidate) {
+    unawaited(widget.desktopManager.showWindow());
+    _queueImportCandidate(candidate);
+  }
 
   void _queueImportCandidate(ImportCandidate candidate) {
+    if (_currentImportSource == candidate.source ||
+        _importQueue.any((queued) => queued.source == candidate.source)) {
+      return;
+    }
     _importQueue.add(candidate);
     _showNextImportPrompt();
   }
@@ -129,6 +183,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
     if (_showingImportPrompt || _importQueue.isEmpty || !mounted) return;
     _showingImportPrompt = true;
     final candidate = _importQueue.removeAt(0);
+    _currentImportSource = candidate.source;
     final accepted = await showShadDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -139,10 +194,32 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
       ),
     );
     if (accepted == true && mounted) {
-      await _prepareSource(candidate.source);
+      await _queueSource(candidate.source);
     }
+    _currentImportSource = null;
     _showingImportPrompt = false;
     _showNextImportPrompt();
+  }
+
+  Future<void> _queueSource(String source) {
+    for (final queued in _sourceQueue) {
+      if (queued.source == source) return queued.completion.future;
+    }
+    final queued = _QueuedSource(source);
+    _sourceQueue.add(queued);
+    unawaited(_prepareNextSource());
+    return queued.completion.future;
+  }
+
+  Future<void> _prepareNextSource() async {
+    if (_preparingSource || !mounted) return;
+    _preparingSource = true;
+    while (_sourceQueue.isNotEmpty && mounted) {
+      final queued = _sourceQueue.removeAt(0);
+      await _prepareSource(queued.source);
+      queued.completion.complete();
+    }
+    _preparingSource = false;
   }
 
   Future<void> _openSourceDialog() async {
@@ -164,7 +241,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
             onPressed: () {
               final value = sourceController.text;
               Navigator.of(dialogContext).pop();
-              _prepareSource(value);
+              _queueSource(value);
             },
             child: Text(l10n.continueAction),
           ),
@@ -246,8 +323,14 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
                   children: <Widget>[
                     _Sidebar(
                       settingsOpen: _settingsOpen,
+                      collapsed: widget.controller.settings.sidebarCollapsed,
                       onDownloads: () => setState(() => _settingsOpen = false),
                       onSettings: () => setState(() => _settingsOpen = true),
+                      onToggleCollapsed: () => unawaited(
+                        widget.controller.setSidebarCollapsed(
+                          !widget.controller.settings.sidebarCollapsed,
+                        ),
+                      ),
                       activeCount: widget.controller.downloads
                           .where((item) => !item.isPaused && !item.isFinished)
                           .length,
@@ -269,6 +352,13 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
       },
     );
   }
+}
+
+class _QueuedSource {
+  _QueuedSource(this.source);
+
+  final String source;
+  final Completer<void> completion = Completer<void>();
 }
 
 class ImportCandidateDialog extends StatelessWidget {
@@ -386,59 +476,83 @@ class _WindowBar extends StatelessWidget {
 class _Sidebar extends StatelessWidget {
   const _Sidebar({
     required this.settingsOpen,
+    required this.collapsed,
     required this.onDownloads,
     required this.onSettings,
+    required this.onToggleCollapsed,
     required this.activeCount,
   });
 
   final bool settingsOpen;
+  final bool collapsed;
   final VoidCallback onDownloads;
   final VoidCallback onSettings;
+  final VoidCallback onToggleCollapsed;
   final int activeCount;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      width: 210,
+      width: collapsed ? 64 : 210,
       decoration: const BoxDecoration(
         color: _panel,
         border: Border(right: BorderSide(color: _border)),
       ),
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(collapsed ? 12 : 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              _BrandMark(),
-              SizedBox(width: 10),
-              Text(
-                l10n.appTitle,
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
+          if (collapsed)
+            Center(child: _BrandMark())
+          else
+            Row(
+              children: <Widget>[
+                _BrandMark(),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.appTitle,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                _SidebarToggle(
+                  collapsed: collapsed,
+                  onPressed: onToggleCollapsed,
+                ),
+              ],
+            ),
+          const SizedBox(height: 12),
+          if (collapsed) ...<Widget>[
+            _SidebarToggle(collapsed: collapsed, onPressed: onToggleCollapsed),
+            const SizedBox(height: 12),
+          ],
           _NavigationItem(
             label: l10n.downloads,
             icon: LucideIcons.list,
             selected: !settingsOpen,
+            collapsed: collapsed,
             onPressed: onDownloads,
           ),
           _NavigationItem(
             label: l10n.settings,
             icon: LucideIcons.settings,
             selected: settingsOpen,
+            collapsed: collapsed,
             onPressed: onSettings,
           ),
           const Spacer(),
-          Text(
-            l10n.engineConnected,
-            style: TextStyle(color: _muted, fontSize: 12),
-          ),
-          const SizedBox(height: 6),
+          if (!collapsed) ...<Widget>[
+            Text(
+              l10n.engineConnected,
+              style: const TextStyle(color: _muted, fontSize: 12),
+            ),
+            const SizedBox(height: 6),
+          ],
           Row(
+            mainAxisAlignment: collapsed
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
             children: <Widget>[
               const SizedBox(
                 width: 7,
@@ -450,11 +564,13 @@ class _Sidebar extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 7),
-              Text(
-                l10n.activeDownloads(activeCount),
-                style: const TextStyle(fontSize: 12),
-              ),
+              if (!collapsed) ...<Widget>[
+                const SizedBox(width: 7),
+                Text(
+                  l10n.activeDownloads(activeCount),
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
             ],
           ),
         ],
@@ -489,28 +605,69 @@ class _NavigationItem extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.selected,
+    required this.collapsed,
     required this.onPressed,
   });
 
   final String label;
   final IconData icon;
   final bool selected;
+  final bool collapsed;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
+    final button = collapsed
+        ? ShadIconButton.ghost(
+            width: 40,
+            height: 40,
+            padding: EdgeInsets.zero,
+            foregroundColor: selected ? null : _muted,
+            backgroundColor: selected ? const Color(0xff27272a) : null,
+            onPressed: onPressed,
+            icon: Icon(icon, size: 16),
+          )
+        : ShadButton.ghost(
+            onPressed: onPressed,
+            backgroundColor: selected ? const Color(0xff27272a) : null,
+            width: double.infinity,
+            mainAxisAlignment: MainAxisAlignment.start,
+            leading: Icon(icon, size: 16),
+            child: Text(label),
+          );
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
-      child: ShadButton.ghost(
-        onPressed: onPressed,
-        backgroundColor: selected ? const Color(0xff27272a) : null,
-        width: double.infinity,
-        mainAxisAlignment: MainAxisAlignment.start,
-        leading: Icon(icon, size: 16),
-        child: Text(label),
+      child: Semantics(
+        label: label,
+        button: true,
+        child: collapsed ? Center(child: button) : button,
       ),
     );
   }
+}
+
+class _SidebarToggle extends StatelessWidget {
+  const _SidebarToggle({required this.collapsed, required this.onPressed});
+
+  final bool collapsed;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: collapsed ? 'Expand sidebar' : 'Collapse sidebar',
+    button: true,
+    child: ShadIconButton.ghost(
+      width: 32,
+      height: 32,
+      padding: EdgeInsets.zero,
+      foregroundColor: _muted,
+      onPressed: onPressed,
+      icon: Icon(
+        collapsed ? LucideIcons.panelLeftOpen : LucideIcons.panelLeftClose,
+        size: 16,
+      ),
+    ),
+  );
 }
 
 class DownloadsView extends StatelessWidget {
@@ -874,7 +1031,6 @@ class FileSelectionDialog extends StatefulWidget {
 class _FileSelectionDialogState extends State<FileSelectionDialog> {
   late final Set<int> _selected;
   late final TextEditingController _directory;
-  late final TextEditingController _folderName;
   bool _starting = false;
   String? _error;
 
@@ -883,13 +1039,11 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
     super.initState();
     _selected = widget.prepared.files.map((file) => file.index).toSet();
     _directory = TextEditingController(text: widget.prepared.directory);
-    _folderName = TextEditingController(text: widget.prepared.name);
   }
 
   @override
   void dispose() {
     _directory.dispose();
-    _folderName.dispose();
     super.dispose();
   }
 
@@ -908,7 +1062,6 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
         widget.prepared,
         _selected,
         _directory.text,
-        _folderName.text,
       );
       if (mounted) Navigator.of(context).pop();
     } catch (error) {
@@ -1050,18 +1203,6 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.folderName,
-              style: const TextStyle(
-                color: _muted,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: .7,
-              ),
-            ),
-            const SizedBox(height: 6),
-            ShadInput(controller: _folderName),
             if (_error != null) ...<Widget>[
               const SizedBox(height: 8),
               Text(

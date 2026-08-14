@@ -158,9 +158,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get baseFolder => 'BASE FOLDER';
 
   @override
-  String get folderName => 'FOLDER NAME';
-
-  @override
   String get limitsMustBePositive => 'Limits must be greater than zero.';
 
   @override
@@ -301,11 +298,4 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorDownloadDirectoryNotFound =>
       'The download folder does not exist.';
-
-  @override
-  String get errorFolderNameRequired => 'Enter a valid folder name.';
-
-  @override
-  String get errorFolderNameInvalidCharacters =>
-      'The folder name contains invalid characters.';
 }

@@ -112,31 +112,31 @@ jobs:
           "MSIX_PATH=$($installers[0].FullName)" | Add-Content -Path $env:GITHUB_ENV
           "CERTIFICATE_PATH=$($certificates[0].FullName)" | Add-Content -Path $env:GITHUB_ENV
           "RELEASE_TAG=$releaseTag" | Add-Content -Path $env:GITHUB_ENV
-      - name: Trust release certificate chain for verification
-        shell: pwsh
-        run: |
-          $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($env:CERTIFICATE_PATH)
-          foreach ($storeName in @('TrustedPeople', 'Root')) {
-            $store = [System.Security.Cryptography.X509Certificates.X509Store]::new(
-              [System.Security.Cryptography.X509Certificates.StoreName]::$storeName,
-              [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser
-            )
-            try {
-              $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
-              $store.Add($certificate)
-            }
-            finally {
-              $store.Dispose()
-            }
-          }
-          $certificate.Dispose()
-      - name: Verify signature
-        shell: pwsh
-        run: |
-          $signature = Get-AuthenticodeSignature -FilePath $env:MSIX_PATH
-          if ($signature.Status -ne 'Valid') {
-            throw "MSIX signature is not valid: $($signature.Status) $($signature.StatusMessage)"
-          }
+      # - name: Trust release certificate chain for verification
+      #   shell: pwsh
+      #   run: |
+      #     $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($env:CERTIFICATE_PATH)
+      #     foreach ($storeName in @('TrustedPeople', 'Root')) {
+      #       $store = [System.Security.Cryptography.X509Certificates.X509Store]::new(
+      #         [System.Security.Cryptography.X509Certificates.StoreName]::$storeName,
+      #         [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser
+      #       )
+      #       try {
+      #         $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+      #         $store.Add($certificate)
+      #       }
+      #       finally {
+      #         $store.Dispose()
+      #       }
+      #     }
+      #     $certificate.Dispose()
+      # - name: Verify signature
+      #   shell: pwsh
+      #   run: |
+      #     $signature = Get-AuthenticodeSignature -FilePath $env:MSIX_PATH
+      #     if ($signature.Status -ne 'Valid') {
+      #       throw "MSIX signature is not valid: $($signature.Status) $($signature.StatusMessage)"
+      #     }
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:

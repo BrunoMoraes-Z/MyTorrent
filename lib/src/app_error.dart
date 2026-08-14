@@ -8,8 +8,6 @@ enum AppErrorCode {
   fileSelectionRequired,
   destinationNotFound,
   downloadDirectoryNotFound,
-  folderNameRequired,
-  folderNameInvalidCharacters,
 }
 
 class AppException implements Exception {

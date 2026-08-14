@@ -15,6 +15,7 @@ void main() {
       downloadDirectory: r'C:\Downloads',
       downloadLimitMb: 12.5,
       restoreOnLaunch: false,
+      sidebarCollapsed: true,
       language: AppLanguage.en,
     );
 
@@ -24,6 +25,7 @@ void main() {
     expect(restored.downloadDirectory, expected.downloadDirectory);
     expect(restored.downloadLimitMb, 12.5);
     expect(restored.restoreOnLaunch, isFalse);
+    expect(restored.sidebarCollapsed, isTrue);
     expect(restored.language, AppLanguage.en);
     expect(
       File(

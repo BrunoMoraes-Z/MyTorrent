@@ -46,6 +46,7 @@ class AppSettings {
     this.notifyOnComplete = true,
     this.enableDht = false,
     this.fetchTrackers = false,
+    this.sidebarCollapsed = false,
     this.language = AppLanguage.en,
   });
 
@@ -57,6 +58,7 @@ class AppSettings {
   final bool notifyOnComplete;
   final bool enableDht;
   final bool fetchTrackers;
+  final bool sidebarCollapsed;
   final AppLanguage language;
 
   AppSettings copyWith({
@@ -70,6 +72,7 @@ class AppSettings {
     bool? notifyOnComplete,
     bool? enableDht,
     bool? fetchTrackers,
+    bool? sidebarCollapsed,
     AppLanguage? language,
   }) {
     return AppSettings(
@@ -86,6 +89,7 @@ class AppSettings {
       notifyOnComplete: notifyOnComplete ?? this.notifyOnComplete,
       enableDht: enableDht ?? this.enableDht,
       fetchTrackers: fetchTrackers ?? this.fetchTrackers,
+      sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
       language: language ?? this.language,
     );
   }
@@ -99,6 +103,7 @@ class AppSettings {
     'notifyOnComplete': notifyOnComplete,
     'enableDht': enableDht,
     'fetchTrackers': fetchTrackers,
+    'sidebarCollapsed': sidebarCollapsed,
     'language': language.persistedValue,
   };
 
@@ -113,6 +118,7 @@ class AppSettings {
       notifyOnComplete: json['notifyOnComplete'] as bool? ?? true,
       enableDht: json['enableDht'] as bool? ?? false,
       fetchTrackers: json['fetchTrackers'] as bool? ?? false,
+      sidebarCollapsed: json['sidebarCollapsed'] as bool? ?? false,
       language: AppLanguage.fromPersistedValue(json['language']),
     );
   }

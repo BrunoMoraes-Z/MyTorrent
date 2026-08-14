@@ -1,34 +1,25 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_torrent/src/app_error.dart';
 import 'package:my_torrent/src/download_destination.dart';
 
 void main() {
-  test('builds a dedicated download directory', () {
+  test('uses the selected directory without adding a torrent root', () {
     expect(
-      DownloadDestination.path(r'C:\Downloads', 'Arch Linux'),
-      'C:${Platform.pathSeparator}Downloads${Platform.pathSeparator}Arch Linux',
+      DownloadDestination.savePath(r' C:\Downloads\Custom '),
+      r'C:\Downloads\Custom',
     );
   });
 
-  test('rejects invalid download folder names', () {
+  test('rejects an empty download directory', () {
     expect(
-      () => DownloadDestination.folderName(r'bad/name'),
+      () => DownloadDestination.savePath(' '),
       throwsA(
         isA<AppException>().having(
           (error) => error.code,
           'code',
-          AppErrorCode.folderNameInvalidCharacters,
+          AppErrorCode.destinationNotFound,
         ),
       ),
-    );
-  });
-
-  test('sanitizes a torrent name for use as the suggested folder', () {
-    expect(
-      DownloadDestination.suggestedFolderName('release: 2026/08'),
-      'release_ 2026_08',
     );
   });
 }

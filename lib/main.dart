@@ -5,8 +5,10 @@ import 'package:protocol_handler/protocol_handler.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'src/app.dart';
+import 'src/activation_source.dart';
 import 'src/app_controller.dart';
 import 'src/desktop_manager.dart';
+import 'src/import_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +31,13 @@ Future<void> main() async {
   } catch (_) {
     // MSIX registers the protocol; the development runner may not be eligible.
   }
+  final notificationService = ImportNotificationService();
+  await notificationService.initialize();
+  final protocolInitialUrl = await protocolHandler.getInitialUrl();
+  final initialSource = activationSource(<String>[
+    ...Platform.executableArguments,
+    protocolInitialUrl ?? '',
+  ]);
   final controller = await AppController.create(
     restartApplication: desktopManager.restart,
     updateDesktopLanguage: desktopManager.updateLanguage,
@@ -37,12 +46,9 @@ Future<void> main() async {
   runApp(
     MyTorrent(
       controller: controller,
-      initialSource: Platform.executableArguments.cast<String?>().firstWhere(
-        (argument) =>
-            argument != null &&
-            (argument.startsWith('magnet:') || argument.endsWith('.torrent')),
-        orElse: () => null,
-      ),
+      desktopManager: desktopManager,
+      notificationService: notificationService,
+      initialSource: initialSource,
     ),
   );
 }

@@ -13,6 +13,7 @@ void main() {
       expect(restored.restoreOnLaunch, isTrue);
       expect(restored.enableDht, isFalse);
       expect(restored.fetchTrackers, isFalse);
+      expect(restored.sidebarCollapsed, isFalse);
       expect(restored.language, AppLanguage.en);
     });
 
@@ -61,6 +62,17 @@ void main() {
       final restored = AppSettings.fromJson(settings.toJson(), r'C:\Fallback');
 
       expect(restored.language, AppLanguage.en);
+    });
+
+    test('persists the collapsed sidebar preference', () {
+      const settings = AppSettings(
+        downloadDirectory: r'C:\Downloads',
+        sidebarCollapsed: true,
+      );
+
+      final restored = AppSettings.fromJson(settings.toJson(), r'C:\Fallback');
+
+      expect(restored.sidebarCollapsed, isTrue);
     });
   });
 

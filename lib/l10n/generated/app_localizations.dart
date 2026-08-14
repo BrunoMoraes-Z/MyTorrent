@@ -351,12 +351,6 @@ abstract class AppLocalizations {
   /// **'PASTA BASE'**
   String get baseFolder;
 
-  /// No description provided for @folderName.
-  ///
-  /// In pt_BR, this message translates to:
-  /// **'NOME DA PASTA'**
-  String get folderName;
-
   /// No description provided for @limitsMustBePositive.
   ///
   /// In pt_BR, this message translates to:
@@ -602,18 +596,6 @@ abstract class AppLocalizations {
   /// In pt_BR, this message translates to:
   /// **'A pasta de download não existe.'**
   String get errorDownloadDirectoryNotFound;
-
-  /// No description provided for @errorFolderNameRequired.
-  ///
-  /// In pt_BR, this message translates to:
-  /// **'Informe um nome de pasta válido.'**
-  String get errorFolderNameRequired;
-
-  /// No description provided for @errorFolderNameInvalidCharacters.
-  ///
-  /// In pt_BR, this message translates to:
-  /// **'O nome da pasta contém caracteres inválidos.'**
-  String get errorFolderNameInvalidCharacters;
 }
 
 class _AppLocalizationsDelegate

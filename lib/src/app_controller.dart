@@ -109,17 +109,15 @@ class AppController extends ChangeNotifier {
     PreparedTorrent prepared,
     Set<int> selected,
     String parentDirectory,
-    String folderName,
   ) async {
     if (selected.isEmpty) {
       throw const AppException(AppErrorCode.fileSelectionRequired);
     }
-    final parent = Directory(parentDirectory.trim());
+    final directory = DownloadDestination.savePath(parentDirectory);
+    final parent = Directory(directory);
     if (!await parent.exists()) {
       throw const AppException(AppErrorCode.destinationNotFound);
     }
-    final directory = DownloadDestination.path(parent.path, folderName);
-    await Directory(directory).create(recursive: true);
     if (directory == prepared.directory) {
       await _start(prepared, selected);
       return;
@@ -183,6 +181,14 @@ class AppController extends ChangeNotifier {
     if (languageChanged) {
       await _updateDesktopLanguage(updated.language);
     }
+    notifyListeners();
+  }
+
+  Future<void> setSidebarCollapsed(bool collapsed) async {
+    if (settings.sidebarCollapsed == collapsed) return;
+    final updated = settings.copyWith(sidebarCollapsed: collapsed);
+    await _settingsStore.save(updated);
+    settings = updated;
     notifyListeners();
   }
 
