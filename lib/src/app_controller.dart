@@ -251,6 +251,7 @@ class AppController extends ChangeNotifier {
               destination != null &&
               !_samePath(source, destination));
       if (!shouldFinalize) {
+        await pause(torrent.id);
         _notifyDownloadComplete(torrent);
         return;
       }
