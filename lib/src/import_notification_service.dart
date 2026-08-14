@@ -47,6 +47,7 @@ class ImportNotificationService {
   Future<void> showCandidate({
     required ImportCandidate candidate,
     required String title,
+    required bool playSound,
   }) async {
     if (!Platform.isWindows) return;
     await _plugin.show(
@@ -54,13 +55,36 @@ class ImportNotificationService {
       title: title,
       body: candidate.label,
       payload: encodeImportCandidate(candidate),
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         windows: WindowsNotificationDetails(
           duration: WindowsNotificationDuration.long,
+          audio: _audio(playSound),
         ),
       ),
     );
   }
+
+  Future<void> showDownloadComplete({
+    required String title,
+    required String body,
+    required bool playSound,
+  }) async {
+    if (!Platform.isWindows) return;
+    await _plugin.show(
+      id: _nextId++,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(
+        windows: WindowsNotificationDetails(audio: _audio(playSound)),
+      ),
+    );
+  }
+
+  WindowsNotificationAudio _audio(bool playSound) => playSound
+      ? WindowsNotificationAudio.preset(
+          sound: WindowsNotificationSound.defaultSound,
+        )
+      : WindowsNotificationAudio.silent();
 
   void _handleResponse(NotificationResponse response) =>
       _handleCandidate(decodeImportCandidate(response.payload));

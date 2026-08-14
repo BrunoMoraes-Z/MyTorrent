@@ -11,6 +11,11 @@ void main() {
       expect(restored.downloadLimitMb, isNull);
       expect(restored.uploadLimitMb, isNull);
       expect(restored.restoreOnLaunch, isTrue);
+      expect(restored.notifyOnComplete, isTrue);
+      expect(restored.soundOnImport, isTrue);
+      expect(restored.soundOnComplete, isTrue);
+      expect(restored.detectMagnetLinks, isTrue);
+      expect(restored.detectTorrentFiles, isTrue);
       expect(restored.enableDht, isFalse);
       expect(restored.fetchTrackers, isFalse);
       expect(restored.sidebarCollapsed, isFalse);
@@ -23,6 +28,27 @@ void main() {
       }, r'C:\Fallback');
 
       expect(restored.language, AppLanguage.en);
+      expect(restored.soundOnImport, isTrue);
+      expect(restored.soundOnComplete, isTrue);
+      expect(restored.detectMagnetLinks, isTrue);
+      expect(restored.detectTorrentFiles, isTrue);
+    });
+
+    test('persists notification and automatic detection preferences', () {
+      const settings = AppSettings(
+        downloadDirectory: r'C:\Downloads',
+        soundOnImport: false,
+        soundOnComplete: false,
+        detectMagnetLinks: false,
+        detectTorrentFiles: false,
+      );
+
+      final restored = AppSettings.fromJson(settings.toJson(), r'C:\Fallback');
+
+      expect(restored.soundOnImport, isFalse);
+      expect(restored.soundOnComplete, isFalse);
+      expect(restored.detectMagnetLinks, isFalse);
+      expect(restored.detectTorrentFiles, isFalse);
     });
 
     test('clears explicit speed limits', () {

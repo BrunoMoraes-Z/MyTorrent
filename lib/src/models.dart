@@ -44,6 +44,10 @@ class AppSettings {
     this.metadataTimeoutSeconds = 30,
     this.restoreOnLaunch = true,
     this.notifyOnComplete = true,
+    this.soundOnImport = true,
+    this.soundOnComplete = true,
+    this.detectMagnetLinks = true,
+    this.detectTorrentFiles = true,
     this.enableDht = false,
     this.fetchTrackers = false,
     this.sidebarCollapsed = false,
@@ -56,6 +60,10 @@ class AppSettings {
   final int metadataTimeoutSeconds;
   final bool restoreOnLaunch;
   final bool notifyOnComplete;
+  final bool soundOnImport;
+  final bool soundOnComplete;
+  final bool detectMagnetLinks;
+  final bool detectTorrentFiles;
   final bool enableDht;
   final bool fetchTrackers;
   final bool sidebarCollapsed;
@@ -70,6 +78,10 @@ class AppSettings {
     int? metadataTimeoutSeconds,
     bool? restoreOnLaunch,
     bool? notifyOnComplete,
+    bool? soundOnImport,
+    bool? soundOnComplete,
+    bool? detectMagnetLinks,
+    bool? detectTorrentFiles,
     bool? enableDht,
     bool? fetchTrackers,
     bool? sidebarCollapsed,
@@ -87,6 +99,10 @@ class AppSettings {
           metadataTimeoutSeconds ?? this.metadataTimeoutSeconds,
       restoreOnLaunch: restoreOnLaunch ?? this.restoreOnLaunch,
       notifyOnComplete: notifyOnComplete ?? this.notifyOnComplete,
+      soundOnImport: soundOnImport ?? this.soundOnImport,
+      soundOnComplete: soundOnComplete ?? this.soundOnComplete,
+      detectMagnetLinks: detectMagnetLinks ?? this.detectMagnetLinks,
+      detectTorrentFiles: detectTorrentFiles ?? this.detectTorrentFiles,
       enableDht: enableDht ?? this.enableDht,
       fetchTrackers: fetchTrackers ?? this.fetchTrackers,
       sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
@@ -101,6 +117,10 @@ class AppSettings {
     'metadataTimeoutSeconds': metadataTimeoutSeconds,
     'restoreOnLaunch': restoreOnLaunch,
     'notifyOnComplete': notifyOnComplete,
+    'soundOnImport': soundOnImport,
+    'soundOnComplete': soundOnComplete,
+    'detectMagnetLinks': detectMagnetLinks,
+    'detectTorrentFiles': detectTorrentFiles,
     'enableDht': enableDht,
     'fetchTrackers': fetchTrackers,
     'sidebarCollapsed': sidebarCollapsed,
@@ -116,6 +136,10 @@ class AppSettings {
           (json['metadataTimeoutSeconds'] as num?)?.toInt() ?? 30,
       restoreOnLaunch: json['restoreOnLaunch'] as bool? ?? true,
       notifyOnComplete: json['notifyOnComplete'] as bool? ?? true,
+      soundOnImport: json['soundOnImport'] as bool? ?? true,
+      soundOnComplete: json['soundOnComplete'] as bool? ?? true,
+      detectMagnetLinks: json['detectMagnetLinks'] as bool? ?? true,
+      detectTorrentFiles: json['detectTorrentFiles'] as bool? ?? true,
       enableDht: json['enableDht'] as bool? ?? false,
       fetchTrackers: json['fetchTrackers'] as bool? ?? false,
       sidebarCollapsed: json['sidebarCollapsed'] as bool? ?? false,

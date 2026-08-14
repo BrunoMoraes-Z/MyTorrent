@@ -234,6 +234,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notifyOnComplete => 'Notificar ao concluir download';
 
   @override
+  String get downloadCompletedNotification => 'Download concluído';
+
+  @override
+  String get notifications => 'Notificações';
+
+  @override
+  String get notificationsDescription => 'Escolha quando o My Torrent deve chamar sua atenção.';
+
+  @override
+  String get soundOnImport => 'Som ao detectar magnet ou .torrent';
+
+  @override
+  String get soundOnComplete => 'Som ao concluir download';
+
+  @override
+  String get automaticDetection => 'Detecção automática';
+
+  @override
+  String get automaticDetectionDescription => 'Procure novos itens para importar sem abrir o aplicativo.';
+
+  @override
+  String get detectMagnetLinks => 'Detectar links magnet na área de transferência';
+
+  @override
+  String get detectTorrentFiles => 'Detectar arquivos .torrent em Downloads';
+
+  @override
   String get language => 'Idioma';
 
   @override
@@ -512,6 +539,33 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get notifyOnComplete => 'Notificar ao concluir download';
+
+  @override
+  String get downloadCompletedNotification => 'Download concluído';
+
+  @override
+  String get notifications => 'Notificações';
+
+  @override
+  String get notificationsDescription => 'Escolha quando o My Torrent deve chamar sua atenção.';
+
+  @override
+  String get soundOnImport => 'Som ao detectar magnet ou .torrent';
+
+  @override
+  String get soundOnComplete => 'Som ao concluir download';
+
+  @override
+  String get automaticDetection => 'Detecção automática';
+
+  @override
+  String get automaticDetectionDescription => 'Procure novos itens para importar sem abrir o aplicativo.';
+
+  @override
+  String get detectMagnetLinks => 'Detectar links magnet na área de transferência';
+
+  @override
+  String get detectTorrentFiles => 'Detectar arquivos .torrent em Downloads';
 
   @override
   String get language => 'Idioma';

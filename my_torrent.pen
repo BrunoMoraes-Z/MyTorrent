@@ -146,7 +146,8 @@
                       "fill": "$muted",
                       "content": "Configurações",
                       "fontFamily": "$font",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -569,7 +570,8 @@
                           "fill": "$muted",
                           "content": "Baixando (2)",
                           "fontFamily": "$font",
-                          "fontSize": 12
+                          "fontSize": 12,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -593,7 +595,8 @@
                           "fill": "$muted",
                           "content": "Pausados (1)",
                           "fontFamily": "$font",
-                          "fontSize": 12
+                          "fontSize": 12,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -617,7 +620,8 @@
                           "fill": "$muted",
                           "content": "Concluídos (14)",
                           "fontFamily": "$font",
-                          "fontSize": 12
+                          "fontSize": 12,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -2093,7 +2097,7 @@
       "name": "Settings Screen",
       "clip": true,
       "width": 1100,
-      "height": 1140,
+      "height": 1450,
       "fill": "$bg",
       "layout": "none",
       "children": [
@@ -2104,7 +2108,7 @@
           "y": 0,
           "name": "Settings Sidebar",
           "width": 210,
-          "height": 1140,
+          "height": 1450,
           "fill": "$panel",
           "stroke": "$border",
           "strokeWidth": {
@@ -2194,7 +2198,8 @@
                       "fill": "$muted",
                       "content": "Downloads",
                       "fontFamily": "$font",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -2245,7 +2250,7 @@
           "y": 0,
           "name": "Settings Main",
           "width": 890,
-          "height": 1140,
+          "height": 1450,
           "layout": "vertical",
           "children": [
             {
@@ -2695,7 +2700,7 @@
                       "id": "h93pe",
                       "name": "Comportamento Description",
                       "fill": "$muted",
-                      "content": "Ajustes para inicialização e notificações.",
+                      "content": "Ajustes para inicialização do aplicativo.",
                       "fontFamily": "$font",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -2741,19 +2746,54 @@
                           ]
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "iptuX",
+                  "name": "Settings Notifications",
+                  "width": "fill_container",
+                  "fill": "$panel",
+                  "cornerRadius": 8,
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 13,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gRvs4",
+                      "name": "Notifications Heading",
+                      "fill": "$text",
+                      "content": "Notificações",
+                      "fontFamily": "$font",
+                      "fontSize": 15,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "tEb9c",
+                      "name": "Notifications Description",
+                      "fill": "$muted",
+                      "content": "Escolha quando o My Torrent deve chamar sua atenção.",
+                      "fontFamily": "$font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "frame",
-                      "id": "c1a76",
-                      "name": "Notificar ao concluir download Row",
+                      "id": "kWn1v",
+                      "name": "Notify on Complete Row",
                       "width": "fill_container",
                       "justifyContent": "space_between",
                       "alignItems": "center",
                       "children": [
                         {
                           "type": "text",
-                          "id": "y6wQe",
-                          "name": "Notificar ao concluir download Label",
+                          "id": "e9P9X",
+                          "name": "Notify on Complete Label",
                           "fill": "$text",
                           "content": "Notificar ao concluir download",
                           "fontFamily": "$font",
@@ -2762,8 +2802,8 @@
                         },
                         {
                           "type": "frame",
-                          "id": "yIyVn",
-                          "name": "Notificar ao concluir download Toggle",
+                          "id": "jvIC5",
+                          "name": "Notify on Complete Toggle",
                           "width": 42,
                           "height": 24,
                           "fill": "$accent",
@@ -2774,8 +2814,211 @@
                           "children": [
                             {
                               "type": "ellipse",
-                              "id": "Ym43m",
-                              "name": "Notificar ao concluir download Toggle Knob",
+                              "id": "bOWJS",
+                              "name": "Notify on Complete Toggle Knob",
+                              "fill": "#111113",
+                              "width": 18,
+                              "height": 18
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "W3M8O",
+                      "name": "Sound on Import Row",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "OrXBN",
+                          "name": "Sound on Import Label",
+                          "fill": "$text",
+                          "content": "Som ao detectar magnet ou .torrent",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Ym5mC",
+                          "name": "Sound on Import Toggle",
+                          "width": 42,
+                          "height": 24,
+                          "fill": "$accent",
+                          "cornerRadius": 12,
+                          "padding": 3,
+                          "justifyContent": "end",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "V8ETEb",
+                              "name": "Sound on Import Toggle Knob",
+                              "fill": "#111113",
+                              "width": 18,
+                              "height": 18
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "G81SH1",
+                      "name": "Sound on Complete Row",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Eq5Iw",
+                          "name": "Sound on Complete Label",
+                          "fill": "$text",
+                          "content": "Som ao concluir download",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "VPtLt",
+                          "name": "Sound on Complete Toggle",
+                          "width": 42,
+                          "height": 24,
+                          "fill": "$accent",
+                          "cornerRadius": 12,
+                          "padding": 3,
+                          "justifyContent": "end",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "aELF3",
+                              "name": "Sound on Complete Toggle Knob",
+                              "fill": "#111113",
+                              "width": 18,
+                              "height": 18
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Xm4vL",
+                  "name": "Settings Automatic Detection",
+                  "width": "fill_container",
+                  "fill": "$panel",
+                  "cornerRadius": 8,
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 13,
+                  "padding": 18,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Z0taxs",
+                      "name": "Automatic Detection Heading",
+                      "fill": "$text",
+                      "content": "Detecção automática",
+                      "fontFamily": "$font",
+                      "fontSize": 15,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "u184Lr",
+                      "name": "Automatic Detection Description",
+                      "fill": "$muted",
+                      "content": "Procure novos itens para importar sem abrir o aplicativo.",
+                      "fontFamily": "$font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EctkW",
+                      "name": "Detect Magnet Links Row",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "hUheL",
+                          "name": "Detect Magnet Links Label",
+                          "fill": "$text",
+                          "content": "Detectar links magnet na área de transferência",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "rcfrW",
+                          "name": "Detect Magnet Links Toggle",
+                          "width": 42,
+                          "height": 24,
+                          "fill": "$accent",
+                          "cornerRadius": 12,
+                          "padding": 3,
+                          "justifyContent": "end",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "C66F6",
+                              "name": "Detect Magnet Links Toggle Knob",
+                              "fill": "#111113",
+                              "width": 18,
+                              "height": 18
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SGdU8",
+                      "name": "Detect Torrent Files Row",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "f8LcpJ",
+                          "name": "Detect Torrent Files Label",
+                          "fill": "$text",
+                          "content": "Detectar arquivos .torrent em Downloads",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "tHHxx",
+                          "name": "Detect Torrent Files Toggle",
+                          "width": 42,
+                          "height": 24,
+                          "fill": "$accent",
+                          "cornerRadius": 12,
+                          "padding": 3,
+                          "justifyContent": "end",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "Y42SYE",
+                              "name": "Detect Torrent Files Toggle Knob",
                               "fill": "#111113",
                               "width": 18,
                               "height": 18
@@ -2952,8 +3195,8 @@
     {
       "type": "frame",
       "id": "aAfJl",
-      "x": 2520,
-      "y": 1219,
+      "x": 2530,
+      "y": 1663,
       "name": "Smart Import Prompt",
       "clip": true,
       "width": 1080,
@@ -3208,6 +3451,1379 @@
                       "fontFamily": "$font",
                       "fontSize": 13,
                       "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "rLYYr",
+      "x": 3700,
+      "y": 0,
+      "name": "Downloads Dashboard - Collapsed Sidebar",
+      "clip": true,
+      "width": 1280,
+      "height": 780,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "aQmsE",
+          "x": 0,
+          "y": 0,
+          "name": "Sidebar",
+          "width": 64,
+          "height": 780,
+          "fill": "$panel",
+          "stroke": "$border",
+          "strokeWidth": {
+            "right": 1
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 12,
+          "children": [
+            {
+              "type": "frame",
+              "id": "UWfMI",
+              "name": "Brand",
+              "width": "fill_container",
+              "height": 44,
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "TmvVJ",
+                  "name": "Brand Mark",
+                  "width": 28,
+                  "height": 28,
+                  "fill": "$accent",
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "AP1RF",
+              "name": "Expand Sidebar",
+              "width": "fill_container",
+              "height": 40,
+              "fill": "#18181B",
+              "cornerRadius": 7,
+              "stroke": "#27272A",
+              "strokeWidth": 1,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "OwMma",
+                  "name": "Expand Sidebar Icon",
+                  "width": 16,
+                  "height": 16,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "m43Nht",
+              "name": "Navigation",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "h5NK6",
+                  "name": "Nav Downloads",
+                  "width": "fill_container",
+                  "fill": "#27272A",
+                  "cornerRadius": 7,
+                  "padding": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "PPPDp",
+                      "name": "Downloads Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "list",
+                      "library": "lucide",
+                      "fill": "$text"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "SzzYN",
+                  "name": "Nav Configurações",
+                  "width": "fill_container",
+                  "fill": "#111113",
+                  "cornerRadius": 7,
+                  "padding": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "s8h6CL",
+                      "name": "Configurações Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "i98oju",
+          "x": 64,
+          "y": 0,
+          "name": "Dashboard Content",
+          "width": 1216,
+          "height": 780,
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "o9sjnb",
+              "name": "Custom Title Bar",
+              "width": 1216,
+              "height": 46,
+              "stroke": "$border",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                0,
+                18
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "N3NG44",
+                  "name": "Window Title",
+                  "fill": "$muted",
+                  "content": "Downloads",
+                  "fontFamily": "$font",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "NpvR4",
+                  "name": "Window Controls",
+                  "gap": 2,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "wOegt",
+                      "name": "Minimize Control",
+                      "width": 30,
+                      "height": 28,
+                      "cornerRadius": 5,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "Pu8MR",
+                          "name": "Minimize Icon",
+                          "width": 14,
+                          "height": 14,
+                          "icon": "minus",
+                          "library": "lucide",
+                          "fill": "$muted"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "u8T4vc",
+                      "name": "Maximize Control",
+                      "width": 30,
+                      "height": 28,
+                      "cornerRadius": 5,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "Pm55O",
+                          "name": "Maximize Icon",
+                          "width": 14,
+                          "height": 14,
+                          "icon": "square",
+                          "library": "lucide",
+                          "fill": "$muted"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CV85l",
+                      "name": "Close Control",
+                      "width": 30,
+                      "height": 28,
+                      "cornerRadius": 5,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "exNRX",
+                          "name": "Close Icon",
+                          "width": 14,
+                          "height": 14,
+                          "icon": "x",
+                          "library": "lucide",
+                          "fill": "$danger"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Z8rBQD",
+              "name": "Downloads Body",
+              "width": 1216,
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 18,
+              "padding": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "OoMBq",
+                  "name": "Heading Row",
+                  "width": 1168,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Kc3NG",
+                      "name": "Heading Text",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "f0VLtS",
+                          "name": "Heading",
+                          "fill": "$text",
+                          "content": "Downloads",
+                          "fontFamily": "$font",
+                          "fontSize": 26,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "H5eej",
+                          "name": "Subheading",
+                          "fill": "$muted",
+                          "content": "Acompanhe e gerencie seus torrents.",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "F9RZH",
+                      "name": "Add Torrent Button",
+                      "fill": "$accent",
+                      "cornerRadius": 7,
+                      "gap": 8,
+                      "padding": [
+                        10,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "G923Sj",
+                          "name": "Add Icon",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "plus",
+                          "library": "lucide",
+                          "fill": "#111113"
+                        },
+                        {
+                          "type": "text",
+                          "id": "pD6WI",
+                          "name": "Add Label",
+                          "fill": "#111113",
+                          "content": "Adicionar torrent",
+                          "fontFamily": "$font",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NBpC9",
+                  "name": "Metrics",
+                  "width": 1168,
+                  "gap": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "rmVh9",
+                      "name": "Metric Baixando",
+                      "width": 150,
+                      "fill": "$card",
+                      "cornerRadius": 8,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "eE5EQ",
+                          "name": "Baixando Label",
+                          "fill": "$muted",
+                          "content": "Baixando",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "q9RPX",
+                          "name": "Baixando Value",
+                          "fill": "$text",
+                          "content": "2",
+                          "fontFamily": "$font",
+                          "fontSize": 22,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "IyHjW",
+                      "name": "Metric Pausados",
+                      "width": 150,
+                      "fill": "$card",
+                      "cornerRadius": 8,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "t22M0K",
+                          "name": "Pausados Label",
+                          "fill": "$muted",
+                          "content": "Pausados",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "VmBys",
+                          "name": "Pausados Value",
+                          "fill": "$text",
+                          "content": "1",
+                          "fontFamily": "$font",
+                          "fontSize": 22,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "O9iqP",
+                      "name": "Metric Concluídos",
+                      "width": 150,
+                      "fill": "$card",
+                      "cornerRadius": 8,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": 14,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "M5y6tR",
+                          "name": "Concluídos Label",
+                          "fill": "$muted",
+                          "content": "Concluídos",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "g63XN",
+                          "name": "Concluídos Value",
+                          "fill": "$text",
+                          "content": "14",
+                          "fontFamily": "$font",
+                          "fontSize": 22,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "BmYME",
+                  "name": "Filters",
+                  "width": 1168,
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "i1yCg",
+                      "name": "Filter Todos (17)",
+                      "fill": "#27272A",
+                      "cornerRadius": 6,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "padding": [
+                        7,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ki9Oh",
+                          "name": "Todos (17) Filter Label",
+                          "fill": "$text",
+                          "content": "Todos (17)",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "fgyix",
+                      "name": "Filter Baixando (2)",
+                      "fill": "$panel",
+                      "cornerRadius": 6,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "padding": [
+                        7,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "upr1G",
+                          "name": "Baixando (2) Filter Label",
+                          "fill": "$muted",
+                          "content": "Baixando (2)",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "WXy6a",
+                      "name": "Filter Pausados (1)",
+                      "fill": "$panel",
+                      "cornerRadius": 6,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "padding": [
+                        7,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "MUccH",
+                          "name": "Pausados (1) Filter Label",
+                          "fill": "$muted",
+                          "content": "Pausados (1)",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "QCZLx",
+                      "name": "Filter Concluídos (14)",
+                      "fill": "$panel",
+                      "cornerRadius": 6,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "padding": [
+                        7,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "HcmiZ",
+                          "name": "Concluídos (14) Filter Label",
+                          "fill": "$muted",
+                          "content": "Concluídos (14)",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "SWFzA",
+                  "name": "Downloads Table",
+                  "clip": true,
+                  "width": 1168,
+                  "height": 430,
+                  "fill": "$panel",
+                  "cornerRadius": 8,
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "tQ9Rq",
+                      "name": "Table Header",
+                      "width": "fill_container",
+                      "height": 42,
+                      "stroke": "$border",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "qJR2b",
+                          "name": "Header Nome",
+                          "width": 330,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "t4FEy",
+                              "name": "Header Nome Label",
+                              "fill": "$muted",
+                              "content": "NOME",
+                              "fontFamily": "$font",
+                              "fontSize": 10,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.7
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "jkEvc",
+                          "name": "Header Progresso",
+                          "width": 190,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "r5qQl",
+                              "name": "Header Progresso Label",
+                              "fill": "$muted",
+                              "content": "PROGRESSO",
+                              "fontFamily": "$font",
+                              "fontSize": 10,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.7
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "dGXlM",
+                          "name": "Header Velocidade",
+                          "width": 130,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "jmufE",
+                              "name": "Header Velocidade Label",
+                              "fill": "$muted",
+                              "content": "VELOCIDADE",
+                              "fontFamily": "$font",
+                              "fontSize": 10,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.7
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "yjfC8",
+                          "name": "Header Status",
+                          "width": 120,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Q6JPyK",
+                              "name": "Header Status Label",
+                              "fill": "$muted",
+                              "content": "STATUS",
+                              "fontFamily": "$font",
+                              "fontSize": 10,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.7
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "j2rEeI",
+                          "name": "Header Ações",
+                          "width": 160,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "okz0i",
+                              "name": "Header Ações Label",
+                              "fill": "$muted",
+                              "content": "AÇÕES",
+                              "fontFamily": "$font",
+                              "fontSize": 10,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.7
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "sUvc7",
+                      "name": "Download Arch Linux 2026.08 x86_64",
+                      "width": "fill_container",
+                      "height": 74,
+                      "stroke": "$border",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "j81o3T",
+                          "name": "Arch Linux 2026.08 x86_64 Name",
+                          "width": 330,
+                          "layout": "vertical",
+                          "gap": 5,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "iX1fn",
+                              "name": "Arch Linux 2026.08 x86_64 Name Label",
+                              "fill": "$text",
+                              "content": "Arch Linux 2026.08 x86_64",
+                              "fontFamily": "$font",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "C2vcI",
+                              "name": "Arch Linux 2026.08 x86_64 Meta",
+                              "fill": "$muted",
+                              "content": "Pasta Downloads",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "kReJd",
+                          "name": "Arch Linux 2026.08 x86_64 Progress",
+                          "width": 190,
+                          "layout": "vertical",
+                          "gap": 7,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 3,
+                              "id": "n4eKI",
+                              "name": "Arch Linux 2026.08 x86_64 Progress Track",
+                              "fill": "#27272A",
+                              "width": 160,
+                              "height": 5
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 3,
+                              "id": "W9xNlr",
+                              "layoutPosition": "absolute",
+                              "x": 0,
+                              "y": 0,
+                              "name": "Arch Linux 2026.08 x86_64 Progress Value",
+                              "fill": "$accent",
+                              "width": 109,
+                              "height": 5
+                            },
+                            {
+                              "type": "text",
+                              "id": "A1cou",
+                              "name": "Arch Linux 2026.08 x86_64 Progress Label",
+                              "fill": "$muted",
+                              "content": "68%",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "a1phD",
+                          "name": "Arch Linux 2026.08 x86_64 Speed",
+                          "width": 130,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "yhyKC",
+                              "name": "Arch Linux 2026.08 x86_64 Speed Label",
+                              "fill": "$text",
+                              "content": "12,4 MB/s",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "oNZZV",
+                          "name": "Arch Linux 2026.08 x86_64 State",
+                          "width": 120,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "fo0Gn",
+                              "name": "Arch Linux 2026.08 x86_64 State Badge",
+                              "fill": "#25311C",
+                              "cornerRadius": 5,
+                              "padding": [
+                                5,
+                                7
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "JhdmN",
+                                  "name": "Arch Linux 2026.08 x86_64 State Label",
+                                  "fill": "$accent",
+                                  "content": "BAIXANDO",
+                                  "fontFamily": "$font",
+                                  "fontSize": 10,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "r6Imt",
+                          "name": "Arch Linux 2026.08 x86_64 Actions",
+                          "width": 160,
+                          "height": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "jouEI",
+                              "name": "Arch Linux 2026.08 x86_64 pause Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "BDlOT",
+                                  "name": "Arch Linux 2026.08 x86_64 pause Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "pause",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "UGeBj",
+                              "name": "Arch Linux 2026.08 x86_64 folder-open Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "hKAsT",
+                                  "name": "Arch Linux 2026.08 x86_64 folder-open Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "folder-open",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "AmPie",
+                              "name": "Arch Linux 2026.08 x86_64 more-horizontal Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "RBcTJ",
+                                  "name": "Arch Linux 2026.08 x86_64 more-horizontal Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "ellipsis",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "oK6Y3",
+                      "name": "Download Documentários de natureza",
+                      "width": "fill_container",
+                      "height": 74,
+                      "stroke": "$border",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "vNbUd",
+                          "name": "Documentários de natureza Name",
+                          "width": 330,
+                          "layout": "vertical",
+                          "gap": 5,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "HNyfS",
+                              "name": "Documentários de natureza Name Label",
+                              "fill": "$text",
+                              "content": "Documentários de natureza",
+                              "fontFamily": "$font",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "MZipy",
+                              "name": "Documentários de natureza Meta",
+                              "fill": "$muted",
+                              "content": "Pasta Downloads",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "l72sId",
+                          "name": "Documentários de natureza Progress",
+                          "width": 190,
+                          "layout": "vertical",
+                          "gap": 7,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 3,
+                              "id": "DfUOa",
+                              "name": "Documentários de natureza Progress Track",
+                              "fill": "#27272A",
+                              "width": 160,
+                              "height": 5
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 3,
+                              "id": "dCqWD",
+                              "layoutPosition": "absolute",
+                              "x": 0,
+                              "y": 0,
+                              "name": "Documentários de natureza Progress Value",
+                              "fill": "$accent",
+                              "width": 51,
+                              "height": 5
+                            },
+                            {
+                              "type": "text",
+                              "id": "F0uMxV",
+                              "name": "Documentários de natureza Progress Label",
+                              "fill": "$muted",
+                              "content": "32%",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "kLr6y",
+                          "name": "Documentários de natureza Speed",
+                          "width": 130,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "JcWTy",
+                              "name": "Documentários de natureza Speed Label",
+                              "fill": "$text",
+                              "content": "4,8 MB/s",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "u9NF7s",
+                          "name": "Documentários de natureza State",
+                          "width": 120,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "FAOrm",
+                              "name": "Documentários de natureza State Badge",
+                              "fill": "#25311C",
+                              "cornerRadius": 5,
+                              "padding": [
+                                5,
+                                7
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "W2sg2e",
+                                  "name": "Documentários de natureza State Label",
+                                  "fill": "$accent",
+                                  "content": "BAIXANDO",
+                                  "fontFamily": "$font",
+                                  "fontSize": 10,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "RFd4t",
+                          "name": "Documentários de natureza Actions",
+                          "width": 160,
+                          "height": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "LU15K",
+                              "name": "Documentários de natureza pause Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "hu6xf",
+                                  "name": "Documentários de natureza pause Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "pause",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "kFP26",
+                              "name": "Documentários de natureza folder-open Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "e9UzvC",
+                                  "name": "Documentários de natureza folder-open Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "folder-open",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "qqcpd",
+                              "name": "Documentários de natureza more-horizontal Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "A9bykg",
+                                  "name": "Documentários de natureza more-horizontal Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "ellipsis",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "hSOWP",
+                      "name": "Download Fotos de viagem 2025",
+                      "width": "fill_container",
+                      "height": 74,
+                      "stroke": "$border",
+                      "strokeWidth": {
+                        "bottom": 1
+                      },
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "asoDP",
+                          "name": "Fotos de viagem 2025 Name",
+                          "width": 330,
+                          "layout": "vertical",
+                          "gap": 5,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "H69O8Q",
+                              "name": "Fotos de viagem 2025 Name Label",
+                              "fill": "$text",
+                              "content": "Fotos de viagem 2025",
+                              "fontFamily": "$font",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "XVOyh",
+                              "name": "Fotos de viagem 2025 Meta",
+                              "fill": "$muted",
+                              "content": "Pasta Downloads",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "fldPQ",
+                          "name": "Fotos de viagem 2025 Progress",
+                          "width": 190,
+                          "layout": "vertical",
+                          "gap": 7,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 3,
+                              "id": "aJbwC",
+                              "name": "Fotos de viagem 2025 Progress Track",
+                              "fill": "#27272A",
+                              "width": 160,
+                              "height": 5
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 3,
+                              "id": "R0TYFH",
+                              "layoutPosition": "absolute",
+                              "x": 0,
+                              "y": 0,
+                              "name": "Fotos de viagem 2025 Progress Value",
+                              "fill": "$accent",
+                              "width": 160,
+                              "height": 5
+                            },
+                            {
+                              "type": "text",
+                              "id": "gLjrD",
+                              "name": "Fotos de viagem 2025 Progress Label",
+                              "fill": "$muted",
+                              "content": "100%",
+                              "fontFamily": "$font",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "xRJmP",
+                          "name": "Fotos de viagem 2025 Speed",
+                          "width": 130,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "MLjhi",
+                              "name": "Fotos de viagem 2025 Speed Label",
+                              "fill": "$text",
+                              "content": "-",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "gszKf",
+                          "name": "Fotos de viagem 2025 State",
+                          "width": 120,
+                          "height": "fill_container",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "ifXzm",
+                              "name": "Fotos de viagem 2025 State Badge",
+                              "fill": "#27272A",
+                              "cornerRadius": 5,
+                              "padding": [
+                                5,
+                                7
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "O42Lb",
+                                  "name": "Fotos de viagem 2025 State Label",
+                                  "fill": "$muted",
+                                  "content": "PAUSADO",
+                                  "fontFamily": "$font",
+                                  "fontSize": 10,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Vd2wI",
+                          "name": "Fotos de viagem 2025 Actions",
+                          "width": 160,
+                          "height": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "eezFF",
+                              "name": "Fotos de viagem 2025 play Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "OhuRd",
+                                  "name": "Fotos de viagem 2025 play Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "play",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "b9ihb",
+                              "name": "Fotos de viagem 2025 folder-open Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "bAcvA",
+                                  "name": "Fotos de viagem 2025 folder-open Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "folder-open",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "D7v2ng",
+                              "name": "Fotos de viagem 2025 more-horizontal Button",
+                              "width": 28,
+                              "height": 28,
+                              "fill": "$card",
+                              "cornerRadius": 5,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "k11hT",
+                                  "name": "Fotos de viagem 2025 more-horizontal Icon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "icon": "ellipsis",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }

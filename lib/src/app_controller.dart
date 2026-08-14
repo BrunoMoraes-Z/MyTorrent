@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'models.dart';
 import 'app_error.dart';
+import 'download_completion_tracker.dart';
 import 'download_session_store.dart';
 import 'download_destination.dart';
 import 'import_detection_service.dart';
@@ -28,6 +29,10 @@ class AppController extends ChangeNotifier {
   final DownloadSessionStore _sessionStore;
   final TorrentService _service;
   final ImportDetectionService _importDetection;
+  final DownloadCompletionTracker _completionTracker =
+      DownloadCompletionTracker();
+  final StreamController<TorrentInfo> _downloadCompletions =
+      StreamController<TorrentInfo>.broadcast();
   final Future<void> Function() _restartApplication;
   final Future<void> Function(AppLanguage) _updateDesktopLanguage;
   StreamSubscription<Map<int, TorrentInfo>>? _updatesSubscription;
@@ -39,6 +44,7 @@ class AppController extends ChangeNotifier {
   Object? lastError;
 
   Stream<ImportCandidate> get importCandidates => _importDetection.candidates;
+  Stream<TorrentInfo> get downloadCompletions => _downloadCompletions.stream;
 
   List<TorrentInfo> get downloads {
     final values = _downloads.values.toList();
@@ -62,6 +68,8 @@ class AppController extends ChangeNotifier {
     );
     final importDetection = ImportDetectionService(
       Directory(downloadDirectory),
+      detectMagnetLinks: settings.detectMagnetLinks,
+      detectTorrentFiles: settings.detectTorrentFiles,
     );
     await importDetection.start();
     final controller = AppController._(
@@ -74,7 +82,13 @@ class AppController extends ChangeNotifier {
       settings,
     );
     controller._updatesSubscription = service.updates.listen((items) {
+      final completed = controller._completionTracker.observe(items);
       controller._downloads = items;
+      if (controller.settings.notifyOnComplete) {
+        for (final torrent in completed) {
+          controller._downloadCompletions.add(torrent);
+        }
+      }
       controller.notifyListeners();
     });
     service.setLimits(settings);
@@ -175,6 +189,10 @@ class AppController extends ChangeNotifier {
     final dhtChanged = updated.enableDht != settings.enableDht;
     final languageChanged = updated.language != settings.language;
     settings = updated;
+    _importDetection.updateSettings(
+      detectMagnetLinks: updated.detectMagnetLinks,
+      detectTorrentFiles: updated.detectTorrentFiles,
+    );
     if (dhtChanged) _service.setDhtEnabled(updated.enableDht);
     _service.setLimits(updated);
     await _settingsStore.save(updated);
@@ -265,6 +283,7 @@ class AppController extends ChangeNotifier {
   void dispose() {
     _updatesSubscription?.cancel();
     _importDetection.dispose();
+    unawaited(_downloadCompletions.close());
     super.dispose();
   }
 }

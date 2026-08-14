@@ -53,4 +53,43 @@ void main() {
     expect(candidates, hasLength(1));
     expect(candidates.single.source, magnet);
   });
+
+  test('respects automatic detection preferences', () async {
+    const magnet = 'magnet:?xt=urn:btih:abcdef';
+    final directory = await Directory.systemTemp.createTemp(
+      'my_torrent_detection_preferences_',
+    );
+    addTearDown(() => directory.delete(recursive: true));
+    final service = ImportDetectionService(
+      directory,
+      clipboardReader: () async => magnet,
+      detectMagnetLinks: false,
+      detectTorrentFiles: false,
+    );
+    final candidates = <ImportCandidate>[];
+    final subscription = service.candidates.listen(candidates.add);
+    addTearDown(subscription.cancel);
+    addTearDown(service.dispose);
+    await File(
+      '${directory.path}${Platform.pathSeparator}new.torrent',
+    ).writeAsString('new');
+
+    await service.scanTorrentFiles();
+    await service.checkClipboard();
+    await Future<void>.delayed(Duration.zero);
+    expect(candidates, isEmpty);
+
+    service.updateSettings(detectMagnetLinks: true, detectTorrentFiles: true);
+    await service.scanTorrentFiles();
+    await service.checkClipboard();
+    await Future<void>.delayed(Duration.zero);
+
+    expect(
+      candidates.map((candidate) => candidate.type),
+      containsAll(<Object>[
+        ImportCandidateType.torrentFile,
+        ImportCandidateType.magnet,
+      ]),
+    );
+  });
 }

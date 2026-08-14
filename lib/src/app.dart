@@ -109,6 +109,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
   final List<_QueuedSource> _sourceQueue = <_QueuedSource>[];
   StreamSubscription<ImportCandidate>? _importSubscription;
   StreamSubscription<ImportCandidate>? _notificationSubscription;
+  StreamSubscription<TorrentInfo>? _completionSubscription;
   bool _showingImportPrompt = false;
   bool _preparingSource = false;
   String? _currentImportSource;
@@ -122,6 +123,9 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
     );
     _notificationSubscription = widget.notificationService.activations.listen(
       _onNotificationActivation,
+    );
+    _completionSubscription = widget.controller.downloadCompletions.listen(
+      _onDownloadComplete,
     );
     final source = widget.initialSource;
     if (source != null) {
@@ -140,6 +144,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
   void dispose() {
     _importSubscription?.cancel();
     _notificationSubscription?.cancel();
+    _completionSubscription?.cancel();
     protocolHandler.removeListener(this);
     super.dispose();
   }
@@ -160,6 +165,7 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
         title: candidate.type == ImportCandidateType.magnet
             ? l10n.magnetLinkFound
             : l10n.torrentFileFound,
+        playSound: widget.controller.settings.soundOnImport,
       ),
     );
     _queueImportCandidate(candidate);
@@ -168,6 +174,17 @@ class _DashboardShellState extends State<DashboardShell> with ProtocolListener {
   void _onNotificationActivation(ImportCandidate candidate) {
     unawaited(widget.desktopManager.showWindow());
     _queueImportCandidate(candidate);
+  }
+
+  void _onDownloadComplete(TorrentInfo torrent) {
+    final l10n = AppLocalizations.of(context)!;
+    unawaited(
+      widget.notificationService.showDownloadComplete(
+        title: l10n.downloadCompletedNotification,
+        body: torrent.name,
+        playSound: widget.controller.settings.soundOnComplete,
+      ),
+    );
   }
 
   void _queueImportCandidate(ImportCandidate candidate) {
@@ -1231,6 +1248,10 @@ class _SettingsViewState extends State<SettingsView> {
   late final TextEditingController _uploadLimit;
   late bool _restore;
   late bool _notify;
+  late bool _soundOnImport;
+  late bool _soundOnComplete;
+  late bool _detectMagnetLinks;
+  late bool _detectTorrentFiles;
   late bool _enableDht;
   late bool _fetchTrackers;
   late AppLanguage _language;
@@ -1249,6 +1270,10 @@ class _SettingsViewState extends State<SettingsView> {
     );
     _restore = settings.restoreOnLaunch;
     _notify = settings.notifyOnComplete;
+    _soundOnImport = settings.soundOnImport;
+    _soundOnComplete = settings.soundOnComplete;
+    _detectMagnetLinks = settings.detectMagnetLinks;
+    _detectTorrentFiles = settings.detectTorrentFiles;
     _enableDht = settings.enableDht;
     _fetchTrackers = settings.fetchTrackers;
     _language = settings.language;
@@ -1291,6 +1316,10 @@ class _SettingsViewState extends State<SettingsView> {
           clearUploadLimit: _uploadLimit.text.trim().isEmpty,
           restoreOnLaunch: _restore,
           notifyOnComplete: _notify,
+          soundOnImport: _soundOnImport,
+          soundOnComplete: _soundOnComplete,
+          detectMagnetLinks: _detectMagnetLinks,
+          detectTorrentFiles: _detectTorrentFiles,
           enableDht: _enableDht,
           fetchTrackers: _fetchTrackers,
           language: _language,
@@ -1455,7 +1484,15 @@ class _SettingsViewState extends State<SettingsView> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          _SettingsPanel(
+            title: l10n.notifications,
+            description: l10n.notificationsDescription,
+            child: Column(
+              children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -1463,6 +1500,62 @@ class _SettingsViewState extends State<SettingsView> {
                     ShadSwitch(
                       value: _notify,
                       onChanged: (value) => setState(() => _notify = value),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(l10n.soundOnImport),
+                    ShadSwitch(
+                      value: _soundOnImport,
+                      onChanged: (value) =>
+                          setState(() => _soundOnImport = value),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(l10n.soundOnComplete),
+                    ShadSwitch(
+                      value: _soundOnComplete,
+                      onChanged: (value) =>
+                          setState(() => _soundOnComplete = value),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          _SettingsPanel(
+            title: l10n.automaticDetection,
+            description: l10n.automaticDetectionDescription,
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(l10n.detectMagnetLinks),
+                    ShadSwitch(
+                      value: _detectMagnetLinks,
+                      onChanged: (value) =>
+                          setState(() => _detectMagnetLinks = value),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(l10n.detectTorrentFiles),
+                    ShadSwitch(
+                      value: _detectTorrentFiles,
+                      onChanged: (value) =>
+                          setState(() => _detectTorrentFiles = value),
                     ),
                   ],
                 ),

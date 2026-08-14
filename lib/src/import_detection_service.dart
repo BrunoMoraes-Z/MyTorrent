@@ -25,12 +25,16 @@ class ImportDetectionService {
     ClipboardTextReader? clipboardReader,
     this.fileInterval = const Duration(seconds: 5),
     this.clipboardInterval = const Duration(seconds: 3),
+    this.detectMagnetLinks = true,
+    this.detectTorrentFiles = true,
   }) : _clipboardReader = clipboardReader ?? _readClipboardText;
 
   final Directory _downloadsDirectory;
   final ClipboardTextReader _clipboardReader;
   final Duration fileInterval;
   final Duration clipboardInterval;
+  bool detectMagnetLinks;
+  bool detectTorrentFiles;
   final Set<String> _handledSources = <String>{};
   final StreamController<ImportCandidate> _candidates =
       StreamController<ImportCandidate>.broadcast();
@@ -40,7 +44,7 @@ class ImportDetectionService {
   Stream<ImportCandidate> get candidates => _candidates.stream;
 
   Future<void> start() async {
-    await snapshotExistingTorrentFiles();
+    if (detectTorrentFiles) await snapshotExistingTorrentFiles();
     _fileTimer = Timer.periodic(fileInterval, (_) => scanTorrentFiles());
     _clipboardTimer = Timer.periodic(
       clipboardInterval,
@@ -58,7 +62,7 @@ class ImportDetectionService {
   }
 
   Future<void> scanTorrentFiles() async {
-    if (!await _downloadsDirectory.exists()) return;
+    if (!detectTorrentFiles || !await _downloadsDirectory.exists()) return;
     await for (final entity in _downloadsDirectory.list()) {
       if (entity is! File || !_isTorrentFile(entity.path)) continue;
       if (await entity.length() == 0) continue;
@@ -75,6 +79,7 @@ class ImportDetectionService {
   }
 
   Future<void> checkClipboard() async {
+    if (!detectMagnetLinks) return;
     final value = (await _clipboardReader())?.trim();
     if (value == null || !_isMagnet(value) || !_handledSources.add(value)) {
       return;
@@ -92,6 +97,14 @@ class ImportDetectionService {
     _handledSources.add(
       _isTorrentFile(source) ? _fileKey(source) : source.trim(),
     );
+  }
+
+  void updateSettings({
+    required bool detectMagnetLinks,
+    required bool detectTorrentFiles,
+  }) {
+    this.detectMagnetLinks = detectMagnetLinks;
+    this.detectTorrentFiles = detectTorrentFiles;
   }
 
   void dispose() {

@@ -243,6 +243,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifyOnComplete => 'Notify when a download completes';
 
   @override
+  String get downloadCompletedNotification => 'Download completed';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get notificationsDescription =>
+      'Choose when My Torrent should get your attention.';
+
+  @override
+  String get soundOnImport => 'Sound when a magnet or .torrent is found';
+
+  @override
+  String get soundOnComplete => 'Sound when a download completes';
+
+  @override
+  String get automaticDetection => 'Automatic detection';
+
+  @override
+  String get automaticDetectionDescription =>
+      'Look for new items to import without opening the app.';
+
+  @override
+  String get detectMagnetLinks => 'Detect magnet links in the clipboard';
+
+  @override
+  String get detectTorrentFiles => 'Detect .torrent files in Downloads';
+
+  @override
   String get language => 'Language';
 
   @override

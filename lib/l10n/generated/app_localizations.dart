@@ -501,6 +501,60 @@ abstract class AppLocalizations {
   /// **'Notificar ao concluir download'**
   String get notifyOnComplete;
 
+  /// No description provided for @downloadCompletedNotification.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Download concluído'**
+  String get downloadCompletedNotification;
+
+  /// No description provided for @notifications.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Notificações'**
+  String get notifications;
+
+  /// No description provided for @notificationsDescription.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Escolha quando o My Torrent deve chamar sua atenção.'**
+  String get notificationsDescription;
+
+  /// No description provided for @soundOnImport.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Som ao detectar magnet ou .torrent'**
+  String get soundOnImport;
+
+  /// No description provided for @soundOnComplete.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Som ao concluir download'**
+  String get soundOnComplete;
+
+  /// No description provided for @automaticDetection.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Detecção automática'**
+  String get automaticDetection;
+
+  /// No description provided for @automaticDetectionDescription.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Procure novos itens para importar sem abrir o aplicativo.'**
+  String get automaticDetectionDescription;
+
+  /// No description provided for @detectMagnetLinks.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Detectar links magnet na área de transferência'**
+  String get detectMagnetLinks;
+
+  /// No description provided for @detectTorrentFiles.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Detectar arquivos .torrent em Downloads'**
+  String get detectTorrentFiles;
+
   /// No description provided for @language.
   ///
   /// In pt_BR, this message translates to:
