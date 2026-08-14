@@ -46,6 +46,7 @@
   "selectedFiles": "{selected} of {total} files selected",
   "@selectedFiles": {"placeholders": {"selected": {"type": "num"}, "total": {"type": "num"}}},
   "baseFolder": "BASE FOLDER",
+  "downloadFolder": "FOLDER NAME",
   "limitsMustBePositive": "Limits must be greater than zero.",
   "settingsSaved": "Settings saved.",
   "restartFailed": "Unable to restart the application: {error}",
@@ -97,5 +98,6 @@
   "errorTorrentFileTooLarge": "The .torrent file exceeds 10 MB.",
   "errorFileSelectionRequired": "Select at least one file to start the download.",
   "errorDestinationNotFound": "The destination folder does not exist.",
+  "errorDownloadFolderInvalid": "Enter a valid folder name.",
   "errorDownloadDirectoryNotFound": "The download folder does not exist."
 }

@@ -39,6 +39,7 @@ String _localizedError(AppLocalizations l10n, Object error) {
       AppErrorCode.torrentFileTooLarge => l10n.errorTorrentFileTooLarge,
       AppErrorCode.fileSelectionRequired => l10n.errorFileSelectionRequired,
       AppErrorCode.destinationNotFound => l10n.errorDestinationNotFound,
+      AppErrorCode.downloadFolderInvalid => l10n.errorDownloadFolderInvalid,
       AppErrorCode.downloadDirectoryNotFound =>
         l10n.errorDownloadDirectoryNotFound,
     };
@@ -1048,6 +1049,7 @@ class FileSelectionDialog extends StatefulWidget {
 class _FileSelectionDialogState extends State<FileSelectionDialog> {
   late final Set<int> _selected;
   late final TextEditingController _directory;
+  late final TextEditingController _folderName;
   bool _starting = false;
   String? _error;
 
@@ -1056,11 +1058,13 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
     super.initState();
     _selected = widget.prepared.files.map((file) => file.index).toSet();
     _directory = TextEditingController(text: widget.prepared.directory);
+    _folderName = TextEditingController(text: widget.prepared.name);
   }
 
   @override
   void dispose() {
     _directory.dispose();
+    _folderName.dispose();
     super.dispose();
   }
 
@@ -1079,13 +1083,14 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
         widget.prepared,
         _selected,
         _directory.text,
+        _folderName.text,
       );
       if (mounted) Navigator.of(context).pop();
     } catch (error) {
       if (mounted) {
         setState(() {
           _starting = false;
-          _error = error.toString().replaceFirst('FormatException: ', '');
+          _error = _localizedError(AppLocalizations.of(context)!, error);
         });
       }
     }
@@ -1220,6 +1225,18 @@ class _FileSelectionDialogState extends State<FileSelectionDialog> {
                 ),
               ],
             ),
+            const SizedBox(height: 14),
+            Text(
+              l10n.downloadFolder,
+              style: const TextStyle(
+                color: _muted,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: .7,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ShadInput(controller: _folderName),
             if (_error != null) ...<Widget>[
               const SizedBox(height: 8),
               Text(

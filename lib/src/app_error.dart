@@ -7,6 +7,7 @@ enum AppErrorCode {
   torrentFileTooLarge,
   fileSelectionRequired,
   destinationNotFound,
+  downloadFolderInvalid,
   downloadDirectoryNotFound,
 }
 

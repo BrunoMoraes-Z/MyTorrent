@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'models.dart';
 import 'app_error.dart';
+import 'download_destination.dart';
 import 'priority_mapper.dart';
 import 'source_parser.dart';
 import 'torrent_file_name.dart';
@@ -16,12 +17,14 @@ class PreparedTorrent {
     required this.source,
     required this.files,
     required this.directory,
+    required this.name,
   });
 
   final int id;
   final TorrentSource source;
   final List<DownloadFile> files;
   final String directory;
+  final String name;
 }
 
 class TorrentService {
@@ -81,6 +84,9 @@ class TorrentService {
         source: source,
         files: files,
         directory: directory,
+        name: DownloadDestination.suggestedFolderName(
+          _engine.torrents[id]?.name ?? files.first.name,
+        ),
       );
     } catch (_) {
       _engine.removeTorrent(id, deleteFiles: false);

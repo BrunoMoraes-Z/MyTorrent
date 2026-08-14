@@ -1481,11 +1481,11 @@
           "type": "frame",
           "id": "w1PHSh",
           "x": 190,
-          "y": 60,
+          "y": 26,
           "name": "Select Files Dialog",
           "clip": true,
           "width": 700,
-          "height": 600,
+          "height": 668,
           "fill": "$panel",
           "cornerRadius": 10,
           "stroke": "$border",
@@ -1600,7 +1600,7 @@
               "id": "aAope",
               "name": "Dialog Content",
               "width": "fill_container",
-              "height": 442,
+              "height": 510,
               "layout": "vertical",
               "gap": 14,
               "padding": 18,
@@ -1927,7 +1927,7 @@
                 {
                   "type": "frame",
                   "id": "LOLPR",
-                  "name": "Destination",
+                  "name": "Base Destination",
                   "width": "fill_container",
                   "layout": "vertical",
                   "gap": 7,
@@ -1937,7 +1937,7 @@
                       "id": "bPvbc",
                       "name": "Destination Label",
                       "fill": "$muted",
-                      "content": "SALVAR EM",
+                      "content": "PASTA BASE",
                       "fontFamily": "$font",
                       "fontSize": 10,
                       "fontWeight": "600",
@@ -2000,6 +2000,97 @@
                           "fontWeight": "600"
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "G2Nk8x",
+                  "name": "Download Folder",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "W6dDvB",
+                      "name": "Destination Label",
+                      "fill": "$muted",
+                      "content": "NOME DA PASTA",
+                      "fontFamily": "$font",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 0.7
+                    },
+                    {
+                      "type": "frame",
+                      "id": "mfxyc",
+                      "name": "Destination Field",
+                      "width": "fill_container",
+                      "height": 38,
+                      "fill": "#0F0F11",
+                      "cornerRadius": 6,
+                      "stroke": "$border",
+                      "strokeWidth": 1,
+                      "padding": [
+                        0,
+                        10
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zr11T",
+                          "name": "Destination Text",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "tu7t3",
+                              "name": "Folder Icon",
+                              "width": 15,
+                              "height": 15,
+                              "icon": "folder",
+                              "library": "lucide",
+                              "fill": "$muted"
+                            },
+                            {
+                              "type": "text",
+                              "id": "v6VMx",
+                              "name": "Destination Path",
+                              "fill": "$text",
+                              "content": "archlinux-2026.08",
+                              "fontFamily": "$font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "Ig6pu",
+                          "name": "Change Destination",
+                          "fill": "$accent",
+                          "content": "Editar",
+                          "fontFamily": "$font",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "m4bdOo",
+                      "name": "Download Destination Preview",
+                      "fill": "$muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Destino final: C:\\Users\\morae\\Downloads\\archlinux-2026.08",
+                      "fontFamily": "$font",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     }
                   ]
                 }

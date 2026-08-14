@@ -351,6 +351,12 @@ abstract class AppLocalizations {
   /// **'PASTA BASE'**
   String get baseFolder;
 
+  /// No description provided for @downloadFolder.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'NOME DA PASTA'**
+  String get downloadFolder;
+
   /// No description provided for @limitsMustBePositive.
   ///
   /// In pt_BR, this message translates to:
@@ -644,6 +650,12 @@ abstract class AppLocalizations {
   /// In pt_BR, this message translates to:
   /// **'A pasta de destino não existe.'**
   String get errorDestinationNotFound;
+
+  /// No description provided for @errorDownloadFolderInvalid.
+  ///
+  /// In pt_BR, this message translates to:
+  /// **'Informe um nome de pasta válido.'**
+  String get errorDownloadFolderInvalid;
 
   /// No description provided for @errorDownloadDirectoryNotFound.
   ///

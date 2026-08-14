@@ -123,15 +123,17 @@ class AppController extends ChangeNotifier {
     PreparedTorrent prepared,
     Set<int> selected,
     String parentDirectory,
+    String folderName,
   ) async {
     if (selected.isEmpty) {
       throw const AppException(AppErrorCode.fileSelectionRequired);
     }
-    final directory = DownloadDestination.savePath(parentDirectory);
-    final parent = Directory(directory);
+    final parent = Directory(DownloadDestination.basePath(parentDirectory));
     if (!await parent.exists()) {
       throw const AppException(AppErrorCode.destinationNotFound);
     }
+    final directory = DownloadDestination.savePath(parent.path, folderName);
+    await Directory(directory).create(recursive: true);
     if (directory == prepared.directory) {
       await _start(prepared, selected);
       return;

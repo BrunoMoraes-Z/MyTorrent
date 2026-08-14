@@ -6,6 +6,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'import_candidate_payload.dart';
 import 'import_detection_service.dart';
 
+const _notificationActivatorGuid = 'ae3828bd-7355-48b0-93ad-9ccdf972ebea';
+
+WindowsNotificationAudio notificationAudio(bool playSound) => playSound
+    ? WindowsNotificationAudio.preset(sound: WindowsNotificationSound.im)
+    : WindowsNotificationAudio.silent();
+
 class ImportNotificationService {
   ImportNotificationService({FlutterLocalNotificationsPlugin? plugin})
     : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
@@ -31,7 +37,7 @@ class ImportNotificationService {
         windows: WindowsInitializationSettings(
           appName: 'My Torrent',
           appUserModelId: 'com.mytorrent.client',
-          guid: 'ae3828bd-7355-48b0-93ad-9ccdf972ebea',
+          guid: _notificationActivatorGuid,
         ),
       ),
       onDidReceiveNotificationResponse: _handleResponse,
@@ -58,7 +64,7 @@ class ImportNotificationService {
       notificationDetails: NotificationDetails(
         windows: WindowsNotificationDetails(
           duration: WindowsNotificationDuration.long,
-          audio: _audio(playSound),
+          audio: notificationAudio(playSound),
         ),
       ),
     );
@@ -75,16 +81,12 @@ class ImportNotificationService {
       title: title,
       body: body,
       notificationDetails: NotificationDetails(
-        windows: WindowsNotificationDetails(audio: _audio(playSound)),
+        windows: WindowsNotificationDetails(
+          audio: notificationAudio(playSound),
+        ),
       ),
     );
   }
-
-  WindowsNotificationAudio _audio(bool playSound) => playSound
-      ? WindowsNotificationAudio.preset(
-          sound: WindowsNotificationSound.defaultSound,
-        )
-      : WindowsNotificationAudio.silent();
 
   void _handleResponse(NotificationResponse response) =>
       _handleCandidate(decodeImportCandidate(response.payload));
