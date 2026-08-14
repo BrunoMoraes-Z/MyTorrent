@@ -332,7 +332,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errorDownloadFolderConflict =>
-      'A pasta escolhida já contém arquivos.';
+      'A pasta escolhida contém um arquivo diferente com o mesmo nome.';
 
   @override
   String get errorDownloadDirectoryNotFound =>
@@ -667,7 +667,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get errorDownloadFolderConflict =>
-      'A pasta escolhida já contém arquivos.';
+      'A pasta escolhida contém um arquivo diferente com o mesmo nome.';
 
   @override
   String get errorDownloadDirectoryNotFound =>

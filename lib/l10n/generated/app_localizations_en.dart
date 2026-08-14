@@ -332,7 +332,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorDownloadFolderConflict =>
-      'The selected folder already contains files.';
+      'The selected folder contains a different file with the same name.';
 
   @override
   String get errorDownloadDirectoryNotFound =>

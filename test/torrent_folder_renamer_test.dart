@@ -31,7 +31,7 @@ void main() {
     );
   });
 
-  test('reuses an existing empty destination folder', () async {
+  test('merges files into an existing destination folder', () async {
     final temporary = await Directory.systemTemp.createTemp('my_torrent_test_');
     addTearDown(() => temporary.delete(recursive: true));
     final source = Directory(
@@ -42,6 +42,9 @@ void main() {
     );
     await source.create();
     await destination.create();
+    await File(
+      '${destination.path}${Platform.pathSeparator}existing.txt',
+    ).writeAsString('existing');
     await File(
       '${source.path}${Platform.pathSeparator}payload.txt',
     ).writeAsString('payload');
@@ -57,5 +60,12 @@ void main() {
       ).readAsString(),
       'payload',
     );
+    expect(
+      await File(
+        '${destination.path}${Platform.pathSeparator}existing.txt',
+      ).readAsString(),
+      'existing',
+    );
+    expect(await source.exists(), isFalse);
   });
 }

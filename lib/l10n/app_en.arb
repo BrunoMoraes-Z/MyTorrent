@@ -99,6 +99,6 @@
   "errorFileSelectionRequired": "Select at least one file to start the download.",
   "errorDestinationNotFound": "The destination folder does not exist.",
   "errorDownloadFolderInvalid": "Enter a valid folder name.",
-  "errorDownloadFolderConflict": "The selected folder already contains files.",
+  "errorDownloadFolderConflict": "The selected folder contains a different file with the same name.",
   "errorDownloadDirectoryNotFound": "The download folder does not exist."
 }

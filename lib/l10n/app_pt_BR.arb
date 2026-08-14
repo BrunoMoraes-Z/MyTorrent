@@ -99,6 +99,6 @@
   "errorFileSelectionRequired": "Selecione ao menos um arquivo para iniciar o download.",
   "errorDestinationNotFound": "A pasta de destino não existe.",
   "errorDownloadFolderInvalid": "Informe um nome de pasta válido.",
-  "errorDownloadFolderConflict": "A pasta escolhida já contém arquivos.",
+  "errorDownloadFolderConflict": "A pasta escolhida contém um arquivo diferente com o mesmo nome.",
   "errorDownloadDirectoryNotFound": "A pasta de download não existe."
 }

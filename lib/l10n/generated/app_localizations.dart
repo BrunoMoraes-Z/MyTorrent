@@ -660,7 +660,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorDownloadFolderConflict.
   ///
   /// In pt_BR, this message translates to:
-  /// **'A pasta escolhida já contém arquivos.'**
+  /// **'A pasta escolhida contém um arquivo diferente com o mesmo nome.'**
   String get errorDownloadFolderConflict;
 
   /// No description provided for @errorDownloadDirectoryNotFound.
