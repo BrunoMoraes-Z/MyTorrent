@@ -24,6 +24,7 @@ jobs:
           $pubCache = if ($env:PUB_CACHE) { $env:PUB_CACHE } else { Join-Path $env:LOCALAPPDATA 'Pub\Cache' }
           $packageDirectory = Join-Path $pubCache 'hosted\pub.dev\libtorrent_flutter-1.9.2'
           $prebuiltDirectory = Join-Path $packageDirectory 'prebuilt\windows'
+          $architectureDirectory = Join-Path $prebuiltDirectory 'x64'
           $archive = Join-Path $env:RUNNER_TEMP 'windows-native-lib-x64.zip'
           $expectedHash = '1cb28e14ae9d176ffe41ab8e80d20ce26db4b831d1f3e0e36900217454bc947c'
 
@@ -36,8 +37,8 @@ jobs:
             throw 'The downloaded libtorrent archive checksum does not match the published release asset.'
           }
 
-          Expand-Archive -LiteralPath $archive -DestinationPath $prebuiltDirectory -Force
-          if (-not (Test-Path -LiteralPath (Join-Path $prebuiltDirectory 'x64\libtorrent_flutter.dll') -PathType Leaf)) {
+          Expand-Archive -LiteralPath $archive -DestinationPath $architectureDirectory -Force
+          if (-not (Test-Path -LiteralPath (Join-Path $architectureDirectory 'libtorrent_flutter.dll') -PathType Leaf)) {
             throw 'The libtorrent archive did not contain the expected x64 DLL.'
           }
       - name: Check formatting
