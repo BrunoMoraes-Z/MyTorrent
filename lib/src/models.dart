@@ -185,7 +185,7 @@ class DownloadSession {
           directory == other.directory &&
           _sameIndexes(selectedIndexes, other.selectedIndexes) &&
           resumeOnLaunch == other.resumeOnLaunch &&
-          contentDirectory == other.contentDirectory &&
+          _effectiveContentDirectory == other._effectiveContentDirectory &&
           torrentRoot == other.torrentRoot &&
           rootLinkPath == other.rootLinkPath;
 
@@ -195,10 +195,12 @@ class DownloadSession {
     directory,
     Object.hashAll(selectedIndexes),
     resumeOnLaunch,
-    contentDirectory,
+    _effectiveContentDirectory,
     torrentRoot,
     rootLinkPath,
   );
+
+  String get _effectiveContentDirectory => contentDirectory ?? directory;
 
   static bool _sameIndexes(List<int> first, List<int> second) {
     if (first.length != second.length) return false;

@@ -68,7 +68,7 @@ void main() {
     expect(restored.restartRequested, isFalse);
   });
 
-  test('removes a restored active session from persistence', () async {
+  test('removes a restored legacy session from persistence', () async {
     final directory = await Directory.systemTemp.createTemp(
       'torrent_session_remove_test_',
     );
@@ -79,7 +79,6 @@ void main() {
       directory: r'C:\Downloads\One',
       selectedIndexes: <int>[0, 2],
       resumeOnLaunch: true,
-      contentDirectory: r'C:\Downloads\Custom One',
       torrentRoot: 'One',
     );
     await store.save(
@@ -87,7 +86,14 @@ void main() {
     );
 
     final restored = await store.load();
-    final active = DownloadSession.fromJson(restored.sessions.single.toJson());
+    final active = DownloadSession(
+      source: restored.sessions.single.source,
+      directory: restored.sessions.single.directory,
+      selectedIndexes: restored.sessions.single.selectedIndexes,
+      resumeOnLaunch: restored.sessions.single.resumeOnLaunch,
+      contentDirectory: restored.sessions.single.directory,
+      torrentRoot: restored.sessions.single.torrentRoot,
+    );
     final sessions = restored.sessions.toList();
 
     expect(sessions.remove(active), isTrue);
@@ -96,7 +102,7 @@ void main() {
     expect((await store.load()).sessions, isEmpty);
   });
 
-  test('updates resume state for a restored active session', () async {
+  test('updates resume state for a restored legacy session', () async {
     final directory = await Directory.systemTemp.createTemp(
       'torrent_session_pause_test_',
     );
@@ -113,7 +119,13 @@ void main() {
     );
 
     final restored = await store.load();
-    final active = DownloadSession.fromJson(restored.sessions.single.toJson());
+    final active = DownloadSession(
+      source: restored.sessions.single.source,
+      directory: restored.sessions.single.directory,
+      selectedIndexes: restored.sessions.single.selectedIndexes,
+      resumeOnLaunch: restored.sessions.single.resumeOnLaunch,
+      contentDirectory: restored.sessions.single.directory,
+    );
     final sessions = restored.sessions.toList();
     final index = sessions.indexOf(active);
 
