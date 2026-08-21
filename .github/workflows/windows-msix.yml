@@ -25,7 +25,7 @@ jobs:
           $packageDirectory = Join-Path $pubCache 'hosted\pub.dev\libtorrent_flutter-1.9.2'
           $prebuiltDirectory = Join-Path $packageDirectory 'prebuilt\windows'
           $archive = Join-Path $env:RUNNER_TEMP 'windows-native-lib-x64.zip'
-          $expectedHash = '0692551cf9c12ed9c15766df1cded89a615f9d340148030e50f4e8f0c9d299d2'
+          $expectedHash = '1cb28e14ae9d176ffe41ab8e80d20ce26db4b831d1f3e0e36900217454bc947c'
 
           if (-not (Test-Path -LiteralPath $packageDirectory -PathType Container)) {
             throw "libtorrent_flutter was not found at $packageDirectory."

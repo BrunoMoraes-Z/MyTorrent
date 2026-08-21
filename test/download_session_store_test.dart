@@ -67,4 +67,60 @@ void main() {
     expect(restored.sessions, isEmpty);
     expect(restored.restartRequested, isFalse);
   });
+
+  test('removes a restored active session from persistence', () async {
+    final directory = await Directory.systemTemp.createTemp(
+      'torrent_session_remove_test_',
+    );
+    addTearDown(() => directory.delete(recursive: true));
+    final store = DownloadSessionStore(directory);
+    const saved = DownloadSession(
+      source: 'magnet:?xt=urn:btih:one',
+      directory: r'C:\Downloads\One',
+      selectedIndexes: <int>[0, 2],
+      resumeOnLaunch: true,
+      contentDirectory: r'C:\Downloads\Custom One',
+      torrentRoot: 'One',
+    );
+    await store.save(
+      const DownloadSessionSnapshot(sessions: <DownloadSession>[saved]),
+    );
+
+    final restored = await store.load();
+    final active = DownloadSession.fromJson(restored.sessions.single.toJson());
+    final sessions = restored.sessions.toList();
+
+    expect(sessions.remove(active), isTrue);
+    await store.save(restored.copyWith(sessions: sessions));
+
+    expect((await store.load()).sessions, isEmpty);
+  });
+
+  test('updates resume state for a restored active session', () async {
+    final directory = await Directory.systemTemp.createTemp(
+      'torrent_session_pause_test_',
+    );
+    addTearDown(() => directory.delete(recursive: true));
+    final store = DownloadSessionStore(directory);
+    const saved = DownloadSession(
+      source: 'magnet:?xt=urn:btih:one',
+      directory: r'C:\Downloads\One',
+      selectedIndexes: <int>[0],
+      resumeOnLaunch: true,
+    );
+    await store.save(
+      const DownloadSessionSnapshot(sessions: <DownloadSession>[saved]),
+    );
+
+    final restored = await store.load();
+    final active = DownloadSession.fromJson(restored.sessions.single.toJson());
+    final sessions = restored.sessions.toList();
+    final index = sessions.indexOf(active);
+
+    expect(index, 0);
+    sessions[index] = active.copyWith(resumeOnLaunch: false);
+    await store.save(restored.copyWith(sessions: sessions));
+
+    expect((await store.load()).sessions.single.resumeOnLaunch, isFalse);
+  });
 }

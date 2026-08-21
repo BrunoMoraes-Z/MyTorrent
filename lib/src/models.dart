@@ -177,6 +177,37 @@ class DownloadSession {
     rootLinkPath: rootLinkPath,
   );
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DownloadSession &&
+          source == other.source &&
+          directory == other.directory &&
+          _sameIndexes(selectedIndexes, other.selectedIndexes) &&
+          resumeOnLaunch == other.resumeOnLaunch &&
+          contentDirectory == other.contentDirectory &&
+          torrentRoot == other.torrentRoot &&
+          rootLinkPath == other.rootLinkPath;
+
+  @override
+  int get hashCode => Object.hash(
+    source,
+    directory,
+    Object.hashAll(selectedIndexes),
+    resumeOnLaunch,
+    contentDirectory,
+    torrentRoot,
+    rootLinkPath,
+  );
+
+  static bool _sameIndexes(List<int> first, List<int> second) {
+    if (first.length != second.length) return false;
+    for (var index = 0; index < first.length; index++) {
+      if (first[index] != second[index]) return false;
+    }
+    return true;
+  }
+
   Map<String, Object?> toJson() => <String, Object?>{
     'source': source,
     'directory': directory,
